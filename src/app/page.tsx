@@ -483,7 +483,8 @@ router.<span style="color:#2dd4bf">get</span>(<span style="color:#fbbf24">'/me'<
 
             <div className="foot-brand">
               <Link href="/" aria-label="Pearl.js home" style={{ display: 'inline-flex', alignItems: 'center', gap: '.6rem', marginBottom: '1.25rem' }}>
-                <span aria-hidden="true" style={{ fontSize: '1.5rem' }}>🦪</span>
+                {/* <span aria-hidden="true" style={{ fontSize: '1.5rem' }}>🦪</span> */}
+                <img src="/logo.svg" width={28} height={28} alt="Pearl.js" style={{ display: 'block' }} />
                 <span style={{ fontWeight: 800, fontSize: '1.1rem', letterSpacing: '-.025em', color: 'var(--text)' }}>
                   Pearl<span style={{ color: 'var(--blue)' }}>.js</span>
                 </span>
