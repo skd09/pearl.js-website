@@ -51,7 +51,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Very subtle ambient light — decorative only */
 body::before {
   content: '';
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
@@ -100,6 +99,41 @@ pre {
 }
 pre code { background: none; border: none; padding: 0; font-size: inherit; color: inherit; }
 
+/* ── Code window ────────────────────────────────────── */
+.code-win {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0,0,0,.55);
+  transition: transform .3s cubic-bezier(.16,1,.3,1), box-shadow .3s;
+}
+.code-win:hover { transform: translateY(-4px) scale(1.005); box-shadow: 0 32px 80px rgba(0,0,0,.65), 0 0 0 1px rgba(96,165,250,.08); }
+.code-win-bar { display: flex; align-items: center; gap: .5rem; padding: .7rem 1.25rem; background: var(--bg3); border-bottom: 1px solid var(--border); }
+.traffic { display: flex; gap: 6px; }
+.traffic span { display: block; width: 11px; height: 11px; border-radius: 50%; }
+.code-win-label { font-family: var(--mono); font-size: .7rem; color: var(--muted); margin-left: .5rem; }
+
+/* pre INSIDE a .code-win — strip the global border/radius; the window is the only box */
+.code-win pre {
+  margin: 0;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: var(--bg2) !important;
+  padding: 1.4rem 1.75rem;
+  font-size: .8rem;
+  line-height: 1.9;
+}
+.code-win pre code {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-size: inherit !important;
+  color: inherit !important;
+}
+
 /* ── Prose (docs) ───────────────────────────────────── */
 .prose h1 { font-size: 2.25rem; font-weight: 800; color: var(--text); letter-spacing: -.03em; margin-bottom: .5rem; }
 .prose h2 { font-size: 1.35rem; font-weight: 700; color: var(--text); margin-top: 2.5rem; margin-bottom: .75rem; padding-bottom: .5rem; border-bottom: 1px solid var(--border); }
@@ -117,27 +151,10 @@ pre code { background: none; border: none; padding: 0; font-size: inherit; color
 .prose strong { color: var(--text); font-weight: 600; }
 .prose hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
 
-/* ── Buttons ────────────────────────────────────────── */
-.btn {
-  padding: .7rem 1.6rem;
-  border-radius: var(--r);
-  font-family: var(--font);
-  font-weight: 600;
-  font-size: .925rem;
-  display: inline-flex;
-  align-items: center;
-  gap: .4rem;
-  cursor: pointer;
-  white-space: nowrap;
-  border: none;
-  transition: background .15s, transform .15s, box-shadow .15s, border-color .15s;
-  text-decoration: none;
-}
-.btn:hover { transform: translateY(-1px); }
-.btn-primary { background: var(--blue); color: #0a0a0f; font-weight: 700; }
-.btn-primary:hover { background: var(--blue2); box-shadow: 0 8px 24px rgba(96,165,250,.3); }
-.btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border2); }
-.btn-secondary:hover { border-color: var(--border2); background: var(--bg3); }
+/* ── Sidebar ────────────────────────────────────────── */
+.sb-link { display: block; padding: .375rem .65rem; border-radius: 6px; font-size: .875rem; color: var(--muted); border-left: 2px solid transparent; transition: all .15s; margin-bottom: 2px; }
+.sb-link:hover { color: var(--text); background: var(--bg2); }
+.sb-link.active { color: var(--blue); background: rgba(96,165,250,.07); border-left-color: var(--blue); padding-left: .85rem; }
 
 /* ── Navbar ─────────────────────────────────────────── */
 .nav-link { padding: .375rem .75rem; border-radius: 6px; font-size: .875rem; font-weight: 500; color: var(--muted); transition: color .15s, background .15s; }
@@ -145,55 +162,21 @@ pre code { background: none; border: none; padding: 0; font-size: inherit; color
 .nav-cta { padding: .375rem 1rem; border-radius: 6px; font-size: .875rem; font-weight: 600; background: var(--blue); color: #0a0a0f; transition: background .15s; }
 .nav-cta:hover { background: var(--blue2); }
 
+/* ── Buttons ────────────────────────────────────────── */
+.btn { padding: .7rem 1.6rem; border-radius: var(--r); font-family: var(--font); font-weight: 600; font-size: .925rem; display: inline-flex; align-items: center; gap: .4rem; cursor: pointer; white-space: nowrap; border: none; transition: background .15s, transform .15s, box-shadow .15s, border-color .15s; text-decoration: none; }
+.btn:hover { transform: translateY(-1px); }
+.btn-primary { background: var(--blue); color: #0a0a0f; font-weight: 700; }
+.btn-primary:hover { background: var(--blue2); box-shadow: 0 8px 24px rgba(96,165,250,.3); }
+.btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border2); }
+.btn-secondary:hover { border-color: var(--border2); background: var(--bg3); }
+
 /* ── Package badge ──────────────────────────────────── */
-.pkg {
-  display: flex;
-  align-items: flex-start;
-  gap: .75rem;
-  padding: 1rem 1.25rem;
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  transition: border-color .2s, background .2s, transform .2s;
-  cursor: default;
-}
+.pkg { display: flex; align-items: flex-start; gap: .75rem; padding: 1rem 1.25rem; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; transition: border-color .2s, background .2s, transform .2s; cursor: default; }
 .pkg:hover { border-color: var(--border2); background: var(--bg3); transform: translateY(-2px); }
 
-/* ── Feature section (alternating) ─────────────────── */
-.feature {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 5rem;
-  align-items: center;
-  padding: 6rem 0;
-  border-top: 1px solid var(--border);
-}
-@media (max-width: 900px) {
-  .feature { grid-template-columns: 1fr !important; gap: 3rem; }
-  .feature > *:first-child { order: 0; }
-  .feature > *:last-child { order: 1; }
-}
-
-/* ── Code window ────────────────────────────────────── */
-.code-win {
-  background: var(--bg2);
-  border: 1px solid var(--border2);
-  border-radius: 14px;
-  overflow: hidden;
-  box-shadow: 0 24px 64px rgba(0,0,0,.55);
-  transition: transform .3s cubic-bezier(.16,1,.3,1), box-shadow .3s;
-}
-.code-win:hover { transform: translateY(-4px) scale(1.005); box-shadow: 0 32px 80px rgba(0,0,0,.65), 0 0 0 1px rgba(96,165,250,.08); }
-.code-win-bar { display: flex; align-items: center; gap: .5rem; padding: .7rem 1.25rem; background: var(--bg3); border-bottom: 1px solid var(--border); }
-.traffic { display: flex; gap: 6px; }
-.traffic span { display: block; width: 11px; height: 11px; border-radius: 50%; }
-.code-win-label { font-family: var(--mono); font-size: .7rem; color: var(--muted); margin-left: .5rem; }
-.code-win pre { margin: 0; padding: 1.5rem 1.75rem; font-size: .8rem; line-height: 1.9; background: transparent; border: none; border-radius: 0; }
-
-/* ── Sidebar ────────────────────────────────────────── */
-.sb-link { display: block; padding: .375rem .65rem; border-radius: 6px; font-size: .875rem; color: var(--muted); border-left: 2px solid transparent; transition: all .15s; margin-bottom: 2px; }
-.sb-link:hover { color: var(--text); background: var(--bg2); }
-.sb-link.active { color: var(--blue); background: rgba(96,165,250,.07); border-left-color: var(--blue); }
+/* ── Feature section ────────────────────────────────── */
+.feature { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; padding: 6rem 0; border-top: 1px solid var(--border); }
+@media (max-width: 900px) { .feature { grid-template-columns: 1fr !important; gap: 3rem; } }
 
 /* ── Footer ─────────────────────────────────────────── */
 .foot-link { color: var(--muted); font-size: .875rem; transition: color .15s; display: inline-flex; align-items: center; gap: .2rem; }
