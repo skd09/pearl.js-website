@@ -19,7 +19,8 @@ export function Navbar() {
       }}>
         {/* Logo */}
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span style={{ fontSize: '1.4rem' }}>🦪</span>
+          {/* <span style={{ fontSize: '1.4rem' }}>🦪</span> */}
+          <img src="/logo.svg" width={28} height={28} alt="Pearl.js" style={{ display: 'block' }} />
           <span style={{ fontFamily: 'var(--font)', fontWeight: 700, fontSize: '1rem', letterSpacing: '-0.02em', color: 'var(--text)' }}>
             Pearl<span style={{ color: 'var(--blue)' }}>.js</span>
           </span>

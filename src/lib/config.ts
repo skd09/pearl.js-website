@@ -24,7 +24,7 @@ export const siteConfig = {
     'Pearl framework',
   ],
   author: 'Sharvari Divekar',
-  // twitterHandle: '@thecoderbuddy',
+  twitterHandle: '@SharvariDivekar',
 }
 
 export const navLinks = [
