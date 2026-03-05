@@ -525,9 +525,9 @@ router.<span style="color:#2dd4bf">get</span>(<span style="color:#fbbf24">'/me'<
           <div style={{ borderTop: '1px solid var(--border)', maxWidth: 1200, margin: '0 auto', padding: '1.5rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '.75rem' }}>
             <p style={{ ...m, fontSize: '.77rem', color: 'var(--muted)' }}>© {new Date().getFullYear()} Pearl.js. MIT License.</p>
             <p style={{ fontSize: '.77rem', color: 'var(--muted)' }}>
-              Built by{' '}
-              <Link href={siteConfig.github} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--body)', textDecoration: 'underline', textUnderlineOffset: '3px' }}>
-                Sharvari Desai
+              Built with ❤️ by{' '}
+              <Link href={siteConfig.portfolio} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--body)', textDecoration: 'underline', textUnderlineOffset: '3px' }}>
+                Sharvari Divekar
               </Link>
             </p>
           </div>

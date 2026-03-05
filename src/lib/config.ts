@@ -7,6 +7,7 @@ export const siteConfig = {
   ogImage: 'https://pearljs.dev/og.png',
   github: 'https://github.com/skd09/pearl.js',
   npm: 'https://www.npmjs.com/package/@pearl-framework/pearl',
+  portfolio: 'https://sharvari.dev',
   keywords: [
     'TypeScript framework',
     'Node.js framework',
@@ -22,8 +23,8 @@ export const siteConfig = {
     'TypeScript web framework',
     'Pearl framework',
   ],
-  author: 'Sharvari Desai',
-  twitterHandle: '@thecoderbuddy',
+  author: 'Sharvari Divekar',
+  // twitterHandle: '@thecoderbuddy',
 }
 
 export const navLinks = [
