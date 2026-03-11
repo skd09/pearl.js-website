@@ -20,7 +20,7 @@ export function Navbar() {
         {/* Logo */}
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           {/* <span style={{ fontSize: '1.4rem' }}>🦪</span> */}
-          <img src="/icon.png" width={28} height={28} alt="Pearl.js" style={{ display: 'block' }} />
+          <img src="/icon.png" width={28} height={28} alt="Pearl.js"/>
           <span style={{ fontFamily: 'var(--font)', fontWeight: 700, fontSize: '1rem', letterSpacing: '-0.02em', color: 'var(--text)' }}>
             Pearl<span style={{ color: 'var(--accent)' }}>.js</span>
           </span>
