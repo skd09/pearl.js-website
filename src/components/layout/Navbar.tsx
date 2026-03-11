@@ -28,7 +28,7 @@ export function Navbar() {
             fontSize: '0.62rem', fontFamily: 'var(--mono)', color: 'var(--muted)',
             border: '1px solid var(--border2)', padding: '1px 6px', borderRadius: 4, marginLeft: 2,
           }}>
-            v0.1.3
+            v0.2.0
           </span>
         </Link>
 
