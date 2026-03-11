@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://pearljs.dev/favicon.svg" width="64" height="64" alt="Pearl.js" />
+<!-- <img src="https://pearljs.dev/logo.svg" width="64" height="64" alt="Pearl.js" /> -->
 
 # Pearl.js
 
@@ -190,7 +190,7 @@ npm run build
 
 ## Author
 
-Built by [Sharvari Desai](https://github.com/skd09) · [@thecoderbuddy](https://twitter.com/thecoderbuddy)
+Built by [Sharvari Divekar](https://github.com/skd09) · [sharvari.dev](https://sharvari.dev)
 
 ## License
 

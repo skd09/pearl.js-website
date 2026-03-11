@@ -22,91 +22,41 @@ export default function EventsPage() {
 
       <h2 id="create-event">Create an event</h2>
       <p>
-        An event is a plain TypeScript class that holds the data for that moment in time.
-        Generate one with the CLI:
+        An event is a plain class that holds data for a moment in time. Generate one:
       </p>
-      <CodeBlock lang="bash" code={`pearl make:event UserRegisteredEvent
-# → src/events/UserRegisteredEvent.ts`} />
-      <CodeBlock lang="typescript" filename="src/events/UserRegisteredEvent.ts" code={`// An event is just a data carrier — no logic, no dependencies
-export class UserRegisteredEvent {
-  constructor(
-    public readonly userId: number,
-    public readonly email:  string,
-  ) {}
-}`} />
+      <CodeBlock lang="bash" code={`pearl make:event UserRegistered\n# → src/events/UserRegisteredEvent.ts`} />
+      <CodeBlock lang="typescript" filename="src/events/UserRegisteredEvent.ts" code={`import { Event } from '@pearl-framework/pearl'\n\n// An event is a data carrier — no logic, no dependencies\nexport class UserRegisteredEvent extends Event {\n  constructor(\n    public readonly userId: number,\n    public readonly email:  string,\n  ) { super() }\n}`} />
 
       <h2 id="create-listener">Create a listener</h2>
       <p>
-        A listener reacts to one event. Generate one with the CLI:
+        A listener extends <code>Listener&lt;T&gt;</code> and implements{' '}
+        <code>handle()</code> for one specific event type:
       </p>
-      <CodeBlock lang="bash" code={`pearl make:listener SendWelcomeEmailListener
-# → src/listeners/SendWelcomeEmailListener.ts`} />
-      <CodeBlock lang="typescript" filename="src/listeners/SendWelcomeEmailListener.ts" code={`import { QueueManager } from '@pearl-framework/pearl'
-import { UserRegisteredEvent } from '../events/UserRegisteredEvent.js'
-
-export class SendWelcomeEmailListener {
-  constructor(private queue: QueueManager) {}
-
-  async handle(event: UserRegisteredEvent): Promise<void> {
-    // Dispatch to a background worker so the response isn't delayed
-    await this.queue.dispatch('default', {
-      job:     'SendWelcomeEmailJob',
-      payload: { userId: event.userId, email: event.email },
-    })
-  }
-}`} />
+      <CodeBlock lang="bash" code={`pearl make:listener SendWelcomeEmail --event UserRegistered\n# → src/listeners/SendWelcomeEmailListener.ts`} />
+      <CodeBlock lang="typescript" filename="src/listeners/SendWelcomeEmailListener.ts" code={`import { Listener } from '@pearl-framework/pearl'\nimport { UserRegisteredEvent } from '../events/UserRegisteredEvent.js'\n\nexport class SendWelcomeEmailListener extends Listener<UserRegisteredEvent> {\n  async handle(event: UserRegisteredEvent): Promise<void> {\n    const job = new SendWelcomeEmailJob()\n    job.userId = event.userId\n    await queue.dispatch(job)\n  }\n\n  // Optional — return false to skip this listener silently\n  shouldHandle(event: UserRegisteredEvent): boolean {\n    return event.userId > 0\n  }\n}`} />
 
       <h2 id="register-listeners">Register listeners</h2>
       <p>
-        Wire events to listeners in your service provider. Each call to{' '}
-        <code>dispatcher.on(EventClass, handler)</code> subscribes a listener to that event.
-        You can attach multiple listeners to the same event.
+        Wire events to listeners in your service provider using{' '}
+        <code>dispatcher.on(EventClass, ListenerClass)</code>. You can attach multiple
+        listeners to the same event.
       </p>
-      <CodeBlock lang="typescript" filename="src/providers/AppServiceProvider.ts" code={`import { EventDispatcher, QueueManager } from '@pearl-framework/pearl'
-import { UserRegisteredEvent } from '../events/UserRegisteredEvent.js'
-import { SendWelcomeEmailListener } from '../listeners/SendWelcomeEmailListener.js'
-
-// Inside register():
-this.container.singleton(EventDispatcher, () => {
-  const queue      = this.container.make(QueueManager)
-  const dispatcher = new EventDispatcher()
-
-  // When UserRegisteredEvent fires, call this listener
-  dispatcher.on(UserRegisteredEvent, async (event) => {
-    await new SendWelcomeEmailListener(queue).handle(event)
-  })
-
-  // You can attach multiple listeners to the same event
-  // dispatcher.on(UserRegisteredEvent, async (event) => { ... })
-
-  return dispatcher
-})`} />
+      <CodeBlock lang="typescript" filename="src/providers/AppServiceProvider.ts" code={`import { EventDispatcher } from '@pearl-framework/pearl'\nimport { UserRegisteredEvent } from '../events/UserRegisteredEvent.js'\nimport { SendWelcomeEmailListener } from '../listeners/SendWelcomeEmailListener.js'\nimport { NotifyAdminsListener } from '../listeners/NotifyAdminsListener.js'\n\n// Inside register():\nthis.container.singleton(EventDispatcher, () => {\n  const dispatcher = new EventDispatcher()\n  dispatcher.on(UserRegisteredEvent, SendWelcomeEmailListener)\n  dispatcher.on(UserRegisteredEvent, NotifyAdminsListener)  // multiple listeners ok\n  return dispatcher\n})`} />
 
       <h2 id="dispatch">Dispatch an event</h2>
       <p>
-        Resolve the <code>EventDispatcher</code> from the container (or inject it into a
-        service) and call <code>dispatcher.dispatch()</code>:
+        Inject <code>EventDispatcher</code> into your service and call{' '}
+        <code>dispatch()</code>. All registered listeners run and are awaited:
       </p>
-      <CodeBlock lang="typescript" code={`// In a controller or service:
-const dispatcher = app.container.make(EventDispatcher)
-
-// Fire the event — all registered listeners run
-await dispatcher.dispatch(new UserRegisteredEvent(user.id, user.email))
-
-// Your service is done. The listeners handle the side effects.`} />
+      <CodeBlock lang="typescript" code={`const dispatcher = app.container.make(EventDispatcher)\n\n// Dispatches and awaits all listeners\nawait dispatcher.dispatch(new UserRegisteredEvent(user.id, user.email))\n\n// Fire-and-forget — does not await listeners\ndispatcher.dispatchSync(new UserRegisteredEvent(user.id, user.email))`} />
 
       <h2 id="tip">Why use events?</h2>
       <p>
-        Without events, your registration handler might look like this — tightly coupled
-        to every side effect:
+        Without events, your registration handler is tightly coupled to every side effect:
       </p>
-      <CodeBlock lang="typescript" code={`// Without events — hard to test, hard to change
-await sendWelcomeEmail(user)
-await notifySlack(user)
-await trackAnalytics('user.registered', user.id)`} />
+      <CodeBlock lang="typescript" code={`// Without events — hard to test, hard to change\nawait sendWelcomeEmail(user)\nawait notifyAdmins(user)\nawait trackAnalytics('user.registered', user.id)`} />
       <p>With events, it becomes one line — and each side effect is independently testable:</p>
-      <CodeBlock lang="typescript" code={`// With events — clean, decoupled, easy to extend
-await dispatcher.dispatch(new UserRegisteredEvent(user.id, user.email))`} />
+      <CodeBlock lang="typescript" code={`// With events — clean, decoupled, easy to extend\nawait dispatcher.dispatch(new UserRegisteredEvent(user.id, user.email))`} />
     </>
   )
 }
