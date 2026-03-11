@@ -10,17 +10,17 @@ export const metadata: Metadata = {
 
 /* ── Real npm packages (from your npm page) ───────────── */
 const packages = [
-  { name: 'core',     accent: '#60a5fa', desc: 'IoC container, application kernel, service providers',                   ver: '0.1.1' },
-  { name: 'http',     accent: '#2dd4bf', desc: 'HTTP kernel — router, middleware pipeline, request/response',             ver: '0.1.1' },
-  { name: 'auth',     accent: '#f87171', desc: 'JWT, session, and API token authentication guards',                       ver: '0.1.1' },
-  { name: 'database', accent: '#fbbf24', desc: 'Drizzle ORM — Postgres, MySQL, SQLite integration',                      ver: '0.1.8' },
-  { name: 'validate', accent: '#a78bfa', desc: 'Zod-powered FormRequest, validation pipes, error formatting',             ver: '0.1.0' },
-  { name: 'events',   accent: '#4ade80', desc: 'Type-safe event dispatcher, listeners, queued events',                   ver: '0.1.1' },
-  { name: 'queue',    accent: '#4ade80', desc: 'BullMQ-powered job dispatching, workers, and retries',                   ver: '0.1.1' },
-  { name: 'mail',     accent: '#2dd4bf', desc: 'Nodemailer-powered mailable classes, transports, queue support',         ver: '0.1.3' },
-  { name: 'testing',  accent: '#a78bfa', desc: 'HTTP test client, database helpers, mail fakes, and test utilities',     ver: '0.1.0' },
-  { name: 'cli',      accent: '#60a5fa', desc: 'CLI for scaffolding — new, serve, make:*',                               ver: '0.1.5' },
-  { name: 'pearl',    accent: '#fbbf24', desc: 'Meta-package — installs all packages above in one command',              ver: '0.1.3' },
+  { name: 'core',     accent: '#60a5fa', desc: 'IoC container, application kernel, service providers',                   ver: '0.2.0' },
+  { name: 'http',     accent: '#2dd4bf', desc: 'HTTP kernel — router, middleware pipeline, request/response',             ver: '0.2.0' },
+  { name: 'auth',     accent: '#f87171', desc: 'JWT, session, and API token authentication guards',                       ver: '0.2.0' },
+  { name: 'database', accent: '#fbbf24', desc: 'Drizzle ORM — Postgres, MySQL, SQLite integration',                      ver: '0.2.0' },
+  { name: 'validate', accent: '#a78bfa', desc: 'Zod-powered FormRequest, validation pipes, error formatting',             ver: '0.2.0' },
+  { name: 'events',   accent: '#4ade80', desc: 'Type-safe event dispatcher, listeners, queued events',                   ver: '0.2.0' },
+  { name: 'queue',    accent: '#4ade80', desc: 'BullMQ-powered job dispatching, workers, and retries',                   ver: '0.2.0' },
+  { name: 'mail',     accent: '#2dd4bf', desc: 'Nodemailer-powered mailable classes, transports, queue support',         ver: '0.2.0' },
+  { name: 'testing',  accent: '#a78bfa', desc: 'HTTP test client, database helpers, mail fakes, and test utilities',     ver: '0.2.0' },
+  { name: 'cli',      accent: '#60a5fa', desc: 'CLI for scaffolding — new, serve, make:*',                               ver: '0.2.0' },
+  { name: 'pearl',    accent: '#fbbf24', desc: 'Meta-package — installs all packages above in one command',              ver: '0.2.0' },
 ]
 
 /* ── Feature sections — full-width alternating layout ── */
@@ -201,7 +201,7 @@ export default function HomePage() {
             {/* Live badge */}
             <div className="fu" style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '.3rem .9rem', borderRadius: 100, background: 'rgba(96,165,250,.09)', border: '1px solid rgba(96,165,250,.2)', marginBottom: '2rem' }}>
               <span aria-hidden="true" style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--green)', flexShrink: 0, animation: 'dot-pulse 2.5s ease-in-out infinite' }} />
-              <span style={{ ...m, fontSize: '.73rem', color: 'var(--blue2)', letterSpacing: '.04em' }}>v0.1.3 · 11 packages · now on npm</span>
+              <span style={{ ...m, fontSize: '.73rem', color: 'var(--blue2)', letterSpacing: '.04em' }}>v0.2.0 · 11 packages · now on npm</span>
             </div>
 
             {/* Headline — clean, NO gradient animation */}
@@ -493,7 +493,7 @@ router.<span style="color:#2dd4bf">get</span>(<span style="color:#fbbf24">'/me'<
                 A batteries-included TypeScript framework for Node.js — 11 packages, one install, zero glue.
               </p>
               <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
-                {['MIT', 'v0.1.3', 'Node ≥ 18', 'TypeScript 5+', '11 packages'].map(t => (
+                {['MIT', 'v0.2.0', 'Node ≥ 20', 'TypeScript 5+', '11 packages'].map(t => (
                   <span key={t} style={{ ...m, fontSize: '.67rem', color: 'var(--muted)', background: 'var(--bg3)', border: '1px solid var(--border)', padding: '.2rem .6rem', borderRadius: 5 }}>{t}</span>
                 ))}
               </div>
