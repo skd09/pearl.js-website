@@ -21,117 +21,37 @@ export default function ControllersPage() {
       </p>
 
       <h2 id="generate">Generate a controller</h2>
-      <CodeBlock lang="bash" code={`pearl make:controller PostController
-# → src/controllers/PostController.ts`} />
+      <CodeBlock lang="bash" code={`pearl make:controller PostController\n# → src/controllers/PostController.ts\n\n# With all resource methods pre-generated:\npearl make:controller Post --resource`} />
 
       <h2 id="writing">Writing a controller</h2>
       <p>
         Declare dependencies as constructor arguments. The IoC container resolves and
         injects them — you never call <code>new PostController(...)</code> yourself.
+        Note that <code>ctx.request.body</code> is a getter — no parentheses.
       </p>
-      <CodeBlock lang="typescript" filename="src/controllers/PostController.ts" code={`import type { HttpContext } from '@pearl-framework/pearl'
-import { DatabaseManager } from '@pearl-framework/pearl'
-import { eq } from '@pearl-framework/pearl'
-import { posts } from '../models/Post.js'
-
-export class PostController {
-  // DatabaseManager is injected automatically by the IoC container
-  constructor(private db: DatabaseManager) {}
-
-  // GET /posts
-  async index(ctx: HttpContext) {
-    const all = await this.db.db.select().from(posts)
-    ctx.response.json({ data: all })
-  }
-
-  // GET /posts/:id
-  async show(ctx: HttpContext) {
-    const id = Number(ctx.request.params.id)
-    const [post] = await this.db.db
-      .select().from(posts).where(eq(posts.id, id))
-    if (!post) {
-      ctx.response.status(404).json({ error: 'Post not found' })
-      return
-    }
-    ctx.response.json({ data: post })
-  }
-
-  // POST /posts — requires authentication
-  async store(ctx: HttpContext) {
-    const { title, content } = await ctx.request.json<{
-      title: string
-      content: string
-    }>()
-    const user  = ctx.auth.user<User>()
-    const [post] = await this.db.db
-      .insert(posts)
-      .values({ title, content, userId: user.id })
-      .returning()
-    ctx.response.status(201).json({ data: post })
-  }
-
-  // DELETE /posts/:id — requires authentication
-  async destroy(ctx: HttpContext) {
-    const id = Number(ctx.request.params.id)
-    await this.db.db.delete(posts).where(eq(posts.id, id))
-    ctx.response.status(204).end()
-  }
-}`} />
+      <CodeBlock lang="typescript" filename="src/controllers/PostController.ts" code={`import type { HttpContext } from '@pearl-framework/pearl'\nimport { DatabaseManager } from '@pearl-framework/pearl'\nimport { eq } from '@pearl-framework/pearl'\nimport { posts } from '../schema/posts.js'\n\nexport class PostController {\n  constructor(private db: DatabaseManager) {}\n\n  // GET /posts\n  async index(ctx: HttpContext) {\n    const all = await this.db.db.select().from(posts)\n    ctx.response.json({ data: all })\n  }\n\n  // GET /posts/:id\n  async show(ctx: HttpContext) {\n    const id = Number(ctx.request.param('id'))\n    const [post] = await this.db.db\n      .select().from(posts).where(eq(posts.id, id))\n    if (!post) return ctx.response.notFound('Post not found')\n    ctx.response.json({ data: post })\n  }\n\n  // POST /posts — requires authentication\n  async store(ctx: HttpContext) {\n    const { title, content } = ctx.request.body as {\n      title: string\n      content: string\n    }\n    const user  = ctx.user()!\n    const [post] = await this.db.db\n      .insert(posts)\n      .values({ title, content, userId: user.id })\n      .returning()\n    ctx.response.created({ data: post })\n  }\n\n  // DELETE /posts/:id — requires authentication\n  async destroy(ctx: HttpContext) {\n    const id = Number(ctx.request.param('id'))\n    await this.db.db.delete(posts).where(eq(posts.id, id))\n    ctx.response.noContent()\n  }\n}`} />
 
       <h2 id="register">Register in AppServiceProvider</h2>
       <p>
         Bind your controller as a singleton inside <code>register()</code>. Pearl uses
         this to know how to build it when you resolve it from the container.
       </p>
-      <CodeBlock lang="typescript" filename="src/providers/AppServiceProvider.ts" code={`import { PostController } from '../controllers/PostController.js'
-
-// Inside register():
-this.container.singleton(PostController, () =>
-  new PostController(
-    this.container.make(DatabaseManager)
-  )
-)`} />
+      <CodeBlock lang="typescript" filename="src/providers/AppServiceProvider.ts" code={`import { PostController } from '../controllers/PostController.js'\n\n// Inside register():\nthis.container.singleton(PostController, () =>\n  new PostController(\n    this.container.make(DatabaseManager)\n  )\n)`} />
 
       <h2 id="wire-routes">Wire to routes</h2>
       <p>
         Resolve the controller from the container after <code>app.boot()</code>, then pass
         its methods to the router:
       </p>
-      <CodeBlock lang="typescript" filename="src/main.ts" code={`const postCtrl = app.container.make(PostController)
-const guard    = [Authenticate(auth)]
-
-router.get('/posts',        (ctx) => postCtrl.index(ctx))
-router.get('/posts/:id',    (ctx) => postCtrl.show(ctx))
-router.post('/posts',       (ctx) => postCtrl.store(ctx),   guard)
-router.delete('/posts/:id', (ctx) => postCtrl.destroy(ctx), guard)`} />
+      <CodeBlock lang="typescript" filename="src/server.ts" code={`const postCtrl = app.container.make(PostController)\nconst guard    = [Authenticate(auth)]\n\nrouter.get('/posts',        (ctx) => postCtrl.index(ctx))\nrouter.get('/posts/:id',    (ctx) => postCtrl.show(ctx))\nrouter.post('/posts',       (ctx) => postCtrl.store(ctx),   guard)\nrouter.delete('/posts/:id', (ctx) => postCtrl.destroy(ctx), guard)`} />
 
       <h2 id="split-routes">Tip: move routes to their own file</h2>
       <p>
         For larger apps, extract route registration into a dedicated file to keep{' '}
-        <code>main.ts</code> clean:
+        <code>server.ts</code> clean:
       </p>
-      <CodeBlock lang="typescript" filename="src/routes/api.ts" code={`import type { Application } from '@pearl-framework/pearl'
-import { Router, Authenticate, AuthManager } from '@pearl-framework/pearl'
-import { PostController } from '../controllers/PostController.js'
-
-export function registerRoutes(app: Application): Router {
-  const router   = new Router()
-  const auth     = app.container.make(AuthManager)
-  const guard    = [Authenticate(auth)]
-  const postCtrl = app.container.make(PostController)
-
-  router.get('/posts',        (ctx) => postCtrl.index(ctx))
-  router.get('/posts/:id',    (ctx) => postCtrl.show(ctx))
-  router.post('/posts',       (ctx) => postCtrl.store(ctx),   guard)
-  router.delete('/posts/:id', (ctx) => postCtrl.destroy(ctx), guard)
-
-  return router
-}`} />
-      <CodeBlock lang="typescript" filename="src/main.ts" code={`import { registerRoutes } from './routes/api.js'
-
-// after app.boot():
-const router = registerRoutes(app)
-await new HttpKernel().useRouter(router).listen(3000)`} />
+      <CodeBlock lang="typescript" filename="src/routes/api.ts" code={`import type { Application } from '@pearl-framework/pearl'\nimport { Router, Authenticate, AuthManager } from '@pearl-framework/pearl'\nimport { PostController } from '../controllers/PostController.js'\n\nexport function registerRoutes(app: Application): Router {\n  const router   = new Router()\n  const auth     = app.container.make(AuthManager)\n  const guard    = [Authenticate(auth)]\n  const postCtrl = app.container.make(PostController)\n\n  router.get('/posts',        (ctx) => postCtrl.index(ctx))\n  router.get('/posts/:id',    (ctx) => postCtrl.show(ctx))\n  router.post('/posts',       (ctx) => postCtrl.store(ctx),   guard)\n  router.delete('/posts/:id', (ctx) => postCtrl.destroy(ctx), guard)\n\n  return router\n}`} />
+      <CodeBlock lang="typescript" filename="src/server.ts" code={`import { registerRoutes } from './routes/api.js'\n\n// after app.boot():\nconst router = registerRoutes(app)\nawait new HttpKernel().useRouter(router).listen(3000)`} />
     </>
   )
 }

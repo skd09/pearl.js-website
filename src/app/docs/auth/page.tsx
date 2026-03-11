@@ -18,7 +18,8 @@ export default function AuthPage() {
       </p>
       <p>
         Once a guard is registered, protect any route by passing{' '}
-        <code>Authenticate(auth)</code> as middleware.
+        <code>Authenticate(auth)</code> as middleware. Inside the handler,{' '}
+        <code>ctx.user()</code> returns the authenticated user.
       </p>
 
       <h2 id="how-it-works">How it works</h2>
@@ -26,103 +27,23 @@ export default function AuthPage() {
         <li>You register a <code>JwtGuard</code> with a <code>UserProvider</code> (your DB logic).</li>
         <li>On login, the guard verifies credentials and issues a signed JWT.</li>
         <li>On subsequent requests, the guard reads the <code>Authorization: Bearer ...</code> header and loads the user.</li>
-        <li>Inside a protected handler, <code>ctx.auth.user()</code> returns the authenticated user.</li>
+        <li>Inside a protected handler, <code>ctx.user()</code> returns the authenticated user.</li>
       </ol>
 
       <h2 id="setup">Setup</h2>
       <p>
-        Register the guard inside <code>AppServiceProvider.register()</code>. You need to
-        implement two methods in <code>UserProvider</code>: one that finds a user by ID
-        (for token verification) and one that finds a user by credentials (for login).
+        Implement <code>UserProvider</code> with two methods — one to find a user by ID
+        (for token verification) and one to find a user by credentials (for login). Then
+        register the guard inside <code>AppServiceProvider.register()</code>.
       </p>
-      <CodeBlock lang="typescript" filename="src/providers/AppServiceProvider.ts" code={`import { JwtGuard, AuthManager, Hash, DatabaseManager } from '@pearl-framework/pearl'
-import type { UserProvider } from '@pearl-framework/pearl'
-import { eq } from '@pearl-framework/pearl'
-import { users } from '../models/User.js'
-
-// Inside register():
-
-this.container.singleton(JwtGuard, () => {
-  const db = this.container.make(DatabaseManager)
-
-  // UserProvider tells the guard how to find users in your database
-  const userProvider: UserProvider = {
-    // Called when verifying a token — loads the user by their ID
-    async findById(id: string) {
-      const [row] = await db.db
-        .select().from(users).where(eq(users.id, Number(id)))
-      return row ?? null
-    },
-
-    // Called on login — checks email + password
-    async findByCredentials(email: string, password: string) {
-      const [row] = await db.db
-        .select().from(users).where(eq(users.email, email))
-      if (!row) return null
-      const valid = await Hash.check(password, row.passwordHash)
-      return valid ? row : null
-    },
-  }
-
-  return new JwtGuard(userProvider, {
-    secret:    process.env.JWT_SECRET ?? 'change-me',
-    expiresIn: '7d',
-  })
-})
-
-this.container.singleton(AuthManager, () => {
-  const manager = new AuthManager()
-  manager.register('jwt', this.container.make(JwtGuard))
-  manager.setDefault('jwt')
-  return manager
-})`} />
+      <CodeBlock lang="typescript" filename="src/providers/AppServiceProvider.ts" code={`import { JwtGuard, AuthManager, Hash, DatabaseManager } from '@pearl-framework/pearl'\nimport type { UserProvider } from '@pearl-framework/pearl'\nimport { eq } from '@pearl-framework/pearl'\nimport { users } from '../schema/users.js'\n\n// Inside register():\n\nthis.container.singleton(JwtGuard, () => {\n  const db = this.container.make(DatabaseManager)\n\n  const userProvider: UserProvider = {\n    // Called when verifying a token — loads the user by their ID\n    async findById(id: string) {\n      const [row] = await db.db\n        .select().from(users).where(eq(users.id, Number(id)))\n      return row ?? null\n    },\n\n    // Called on login — checks email + password\n    async findByCredentials(email: string, password: string) {\n      const [row] = await db.db\n        .select().from(users).where(eq(users.email, email))\n      if (!row) return null\n      return await Hash.check(password, row.password) ? row : null\n    },\n  }\n\n  return new JwtGuard(userProvider, {\n    secret:    process.env.JWT_SECRET!,  // min 32 chars — use: openssl rand -base64 32\n    expiresIn: '7d',\n  })\n})\n\nthis.container.singleton(AuthManager, () => {\n  const manager = new AuthManager()\n  manager.register('jwt', this.container.make(JwtGuard))\n  manager.setDefault('jwt')\n  return manager\n})`} />
 
       <h2 id="auth-controller">Login & register routes</h2>
       <p>
-        Create an <code>AuthController</code> with three methods: one to register a new user,
-        one to log in and return a token, and one to return the currently authenticated user.
+        Create an <code>AuthController</code> with register, login, and me methods.
+        Note that <code>ctx.request.body</code> is a getter — no parentheses.
       </p>
-      <CodeBlock lang="typescript" filename="src/controllers/AuthController.ts" code={`import { Hash, JwtGuard, DatabaseManager } from '@pearl-framework/pearl'
-import type { HttpContext } from '@pearl-framework/pearl'
-import { users } from '../models/User.js'
-
-export class AuthController {
-  constructor(
-    private db:    DatabaseManager,
-    private guard: JwtGuard,
-  ) {}
-
-  // POST /auth/register
-  async register(ctx: HttpContext) {
-    const { name, email, password } = await ctx.request.json<{
-      name: string; email: string; password: string
-    }>()
-    const passwordHash = await Hash.make(password)
-    const [user] = await this.db.db
-      .insert(users).values({ name, email, passwordHash }).returning()
-    const token = await this.guard.issueToken(String(user.id))
-    ctx.response.status(201).json({ token, user })
-  }
-
-  // POST /auth/login
-  async login(ctx: HttpContext) {
-    const { email, password } = await ctx.request.json<{
-      email: string; password: string
-    }>()
-    const user = await this.guard.attempt(email, password)
-    if (!user) {
-      ctx.response.status(401).json({ error: 'Invalid email or password' })
-      return
-    }
-    const token = await this.guard.issueToken(String(user.id))
-    ctx.response.json({ token, user })
-  }
-
-  // GET /auth/me  — protected route
-  async me(ctx: HttpContext) {
-    ctx.response.json({ user: ctx.auth.user() })
-  }
-}`} />
+      <CodeBlock lang="typescript" filename="src/controllers/AuthController.ts" code={`import { Hash, JwtGuard, DatabaseManager } from '@pearl-framework/pearl'\nimport type { HttpContext } from '@pearl-framework/pearl'\nimport { users } from '../schema/users.js'\n\nexport class AuthController {\n  constructor(\n    private db:    DatabaseManager,\n    private guard: JwtGuard,\n  ) {}\n\n  // POST /auth/register\n  async register(ctx: HttpContext) {\n    const { name, email, password } = ctx.request.body as {\n      name: string; email: string; password: string\n    }\n    const [user] = await this.db.db\n      .insert(users)\n      .values({ name, email, password: await Hash.make(password) })\n      .returning()\n    const token = await this.guard.issueToken(String(user.id))\n    ctx.response.created({ token, user })\n  }\n\n  // POST /auth/login\n  async login(ctx: HttpContext) {\n    const { email, password } = ctx.request.body as {\n      email: string; password: string\n    }\n    const user = await this.guard.attempt(email, password)\n    if (!user) return ctx.response.unauthorized('Invalid email or password')\n    const token = await this.guard.issueToken(String(user.id))\n    ctx.response.json({ token, user })\n  }\n\n  // GET /auth/me  — protected route\n  async me(ctx: HttpContext) {\n    ctx.response.json(ctx.user())\n  }\n}`} />
 
       <h2 id="protecting-routes">Protecting routes</h2>
       <p>
@@ -130,38 +51,45 @@ export class AuthController {
         requires a logged-in user. Requests without a valid token get a <code>401</code>{' '}
         automatically.
       </p>
-      <CodeBlock lang="typescript" filename="src/main.ts" code={`const auth     = app.container.make(AuthManager)
-const authCtrl = app.container.make(AuthController)
-const guard    = [Authenticate(auth)]
-
-// Public — no token required
-router.post('/auth/register', (ctx) => authCtrl.register(ctx))
-router.post('/auth/login',    (ctx) => authCtrl.login(ctx))
-
-// Protected — token required
-router.get('/auth/me',  (ctx) => authCtrl.me(ctx),    guard)
-router.post('/posts',   (ctx) => postCtrl.store(ctx),  guard)`} />
+      <CodeBlock lang="typescript" filename="src/server.ts" code={`const auth     = app.container.make(AuthManager)\nconst authCtrl = app.container.make(AuthController)\nconst guard    = [Authenticate(auth)]\n\n// Public — no token required\nrouter.post('/auth/register', (ctx) => authCtrl.register(ctx))\nrouter.post('/auth/login',    (ctx) => authCtrl.login(ctx))\n\n// Protected — valid Bearer token required\nrouter.get('/auth/me',  (ctx) => authCtrl.me(ctx),    guard)\nrouter.post('/posts',   (ctx) => postCtrl.store(ctx),  guard)`} />
 
       <h2 id="using-the-token">Using the token</h2>
       <p>
         Send the token in the <code>Authorization</code> header on every protected request:
       </p>
-      <CodeBlock lang="bash" code={`curl -H "Authorization: Bearer <your-token>" \\
-     http://localhost:3000/auth/me`} />
+      <CodeBlock lang="bash" code={`curl -H "Authorization: Bearer <your-token>" \\\n     http://localhost:3000/auth/me`} />
+
+      <h2 id="optional-auth">Optional auth</h2>
+      <p>
+        Use <code>OptionalAuth(auth)</code> when a route should work for both guests and
+        authenticated users. <code>ctx.user()</code> returns the user if a valid token is
+        present, or <code>null</code> if not — no 401 is sent.
+      </p>
+      <CodeBlock lang="typescript" code={`import { OptionalAuth } from '@pearl-framework/pearl'\n\nrouter.get('/feed', async (ctx) => {\n  const user = ctx.user()  // User | null\n  ctx.response.json(buildFeed(user))\n}, [OptionalAuth(auth)])`} />
 
       <h2 id="password-hashing">Password hashing</h2>
       <p>
-        Use the built-in <code>Hash</code> utility — it uses bcrypt under the hood. Never
-        store plain-text passwords.
+        Use the built-in <code>Hash</code> utility — bcrypt under the hood. Never store
+        plain-text passwords.
       </p>
-      <CodeBlock lang="typescript" code={`import { Hash } from '@pearl-framework/pearl'
+      <CodeBlock lang="typescript" code={`import { Hash } from '@pearl-framework/pearl'\n\n// Hash before storing\nconst hash = await Hash.make('my-password')\n\n// Verify against a stored hash\nconst valid = await Hash.check('my-password', hash)  // true\nconst wrong = await Hash.check('wrong-pass',  hash)  // false`} />
 
-// Hash a password before storing
-const hash = await Hash.make('my-password')
-
-// Verify a password against the stored hash
-const valid = await Hash.check('my-password', hash)  // true
-const wrong = await Hash.check('wrong-pass',  hash)  // false`} />
+      <h2 id="security">Security notes</h2>
+      <ul>
+        <li>
+          <strong>Algorithm pinning</strong> — <code>jwt.verify()</code> is called with an
+          explicit <code>algorithms</code> allowlist. This prevents algorithm confusion
+          attacks where an attacker switches the token's algorithm to bypass verification.
+        </li>
+        <li>
+          <strong><code>none</code> algorithm blocked</strong> — passing{' '}
+          <code>algorithm: 'none'</code> throws at construction time.
+        </li>
+        <li>
+          <strong>Secret strength</strong> — use a minimum of 32 random characters.
+          Generate one with <code>openssl rand -base64 32</code>.
+        </li>
+      </ul>
     </>
   )
 }
