@@ -3,15 +3,15 @@
   <!-- MARK: stylised < P > ligature -->
   <!-- Left chevron -->
   <polyline points="6,8 1,18 6,28"
-    stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    stroke="#00e5a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <!-- Right chevron -->
   <polyline points="26,8 31,18 26,28"
-    stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    stroke="#00e5a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   <!-- Pearl dot — centred between chevrons -->
   <circle cx="16" cy="18" r="4.5"
-    fill="none" stroke="#60a5fa" stroke-width="2"/>
+    fill="none" stroke="#00e5a0" stroke-width="2"/>
   <!-- Inner core -->
-  <circle cx="16" cy="18" r="1.6" fill="#60a5fa"/>
+  <circle cx="16" cy="18" r="1.6" fill="#00e5a0"/>
 
   <!-- WORDMARK -->
   <!-- "Pearl" — white, tight tracking -->
@@ -25,6 +25,6 @@
     font-family="'Geist','Inter',system-ui,sans-serif"
     font-size="19" font-weight="700"
     letter-spacing="-0.045em"
-    fill="#60a5fa">.js</text>
+    fill="#00e5a0">.js</text>
 
 </svg>

@@ -11,7 +11,7 @@ export function Navbar() {
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
       borderBottom: '1px solid var(--border)',
       backdropFilter: 'blur(20px)',
-      background: 'rgba(10,10,15,0.85)',
+      background: 'rgba(13,17,23,0.92)',
     }}>
       <div style={{
         maxWidth: 1200, margin: '0 auto', padding: '0 1.5rem',
@@ -22,7 +22,7 @@ export function Navbar() {
           {/* <span style={{ fontSize: '1.4rem' }}>🦪</span> */}
           <img src="/logo.svg" width={28} height={28} alt="Pearl.js" style={{ display: 'block' }} />
           <span style={{ fontFamily: 'var(--font)', fontWeight: 700, fontSize: '1rem', letterSpacing: '-0.02em', color: 'var(--text)' }}>
-            Pearl<span style={{ color: 'var(--blue)' }}>.js</span>
+            Pearl<span style={{ color: 'var(--accent)' }}>.js</span>
           </span>
           <span style={{
             fontSize: '0.62rem', fontFamily: 'var(--mono)', color: 'var(--muted)',
