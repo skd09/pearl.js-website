@@ -45,7 +45,7 @@ export default function RoutingPage() {
         <code>Authenticate()</code> middleware checks for a valid Bearer token and rejects
         the request with a <code>401</code> if it's missing or invalid.
       </p>
-      <CodeBlock lang="typescript" code={`import { Authenticate, AuthManager } from '@pearl-framework/pearl'\n\nconst auth  = app.container.make(AuthManager)\nconst guard = [Authenticate(auth)]  // define once, reuse anywhere\n\n// These routes require a valid Bearer token\nrouter.post('/posts',       createPost,  guard)\nrouter.delete('/posts/:id', deletePost,  guard)\n\n// On a guarded route, ctx.user() returns the authenticated user\nrouter.get('/me', async (ctx) => {\n  ctx.response.json(ctx.user())\n}, guard)`} />
+      <CodeBlock lang="typescript" code={`import { Authenticate, AuthManager } from '@pearl-framework/pearl'\n\nconst auth  = app.container.make(AuthManager)\nconst guard = [Authenticate(auth)]  // define once, reuse anywhere\n\n// These routes require a valid Bearer token\nrouter.post('/posts',       createPost,  guard)\nrouter.delete('/posts/:id', deletePost,  guard)\n\n// On a guarded route, ctx.get('auth.user') returns the authenticated user\nrouter.get('/me', async (ctx) => {\n  ctx.response.json(ctx.get('auth.user'))\n}, guard)`} />
 
       <h2 id="route-groups">Route groups</h2>
       <p>
@@ -64,7 +64,7 @@ export default function RoutingPage() {
       <p>
         <code>ctx.response</code> is chainable. These cover the common cases:
       </p>
-      <CodeBlock lang="typescript" code={`ctx.response.json({ data })                  // 200 JSON\nctx.response.created({ data })               // 201 Created\nctx.response.noContent()                     // 204 No Content\nctx.response.badRequest('Bad input')         // 400\nctx.response.unauthorized()                  // 401\nctx.response.forbidden()                     // 403\nctx.response.notFound('Not found')           // 404\nctx.response.redirect('/login')              // 302 Redirect\nctx.response.status(418).json({ im: 'a teapot' })  // custom status`} />
+      <CodeBlock lang="typescript" code={`ctx.response.json({ data })                  // 200 JSON\nctx.response.created({ data })               // 201 Created\nctx.response.noContent()                     // 204 No Content\nctx.response.status(400).json({ message: 'Bad input' })  // 400\nctx.response.unauthorized()                  // 401\nctx.response.forbidden()                     // 403\nctx.response.notFound('Not found')           // 404\nctx.response.redirect('/login')              // 302 Redirect\nctx.response.status(418).json({ im: 'a teapot' })  // custom status`} />
 
       <h2 id="reference">HttpContext reference</h2>
       <table>
@@ -80,7 +80,7 @@ export default function RoutingPage() {
           <tr><td><code>ctx.request.url</code></td><td><code>string</code></td><td>Full request URL</td></tr>
           <tr><td><code>ctx.request.ip()</code></td><td><code>string</code></td><td>Client IP address</td></tr>
           <tr><td><code>ctx.response</code></td><td><code>Response</code></td><td>Builder for the outgoing response</td></tr>
-          <tr><td><code>ctx.user()</code></td><td><code>AuthUser | null</code></td><td>Authenticated user (guarded routes)</td></tr>
+          <tr><td><code>ctx.get('auth.user')</code></td><td><code>AuthUser | undefined</code></td><td>Authenticated user (guarded routes)</td></tr>
         </tbody>
       </table>
     </>

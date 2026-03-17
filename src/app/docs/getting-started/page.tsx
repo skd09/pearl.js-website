@@ -29,7 +29,7 @@ export default function GettingStartedPage() {
         The fastest way to get started. One command creates a fully structured project,
         installs dependencies, and generates a <code>.env</code> file for you.
       </p>
-      <CodeBlock lang="bash" code={`npx @pearl-framework/cli new my-api\ncd my-api\npearl serve`} />
+      <CodeBlock lang="bash" code={`npx @pearl-framework/cli new my-api\ncd my-api\nnpm run dev`} />
       <p>
         Your server is now running at <strong>http://localhost:3000</strong>. That's it.
       </p>
@@ -52,16 +52,16 @@ export default function GettingStartedPage() {
       </p>
       <ul>
         <li>
-          <strong>No <code>import 'dotenv/config'</code> needed.</strong> Pearl loads{' '}
-          <code>.env</code> inside <code>app.boot()</code> automatically, before any of
-          your service providers run.
+          <strong><code>import 'dotenv/config'</code></strong> is included at the top of
+          the generated <code>server.ts</code> — this loads your <code>.env</code> before
+          anything else runs.
         </li>
         <li>
           <strong><code>root: import.meta.dirname</code></strong> tells Pearl where your
-          project root is so it can find <code>.env</code> and config files. Don't remove it.
+          project root is so it can find config files. Don't remove it.
         </li>
       </ul>
-      <CodeBlock lang="typescript" filename="src/server.ts" code={`import { Application, HttpKernel, Router } from '@pearl-framework/pearl'\nimport { AppServiceProvider } from './providers/AppServiceProvider.js'\n\nconst app = new Application({ root: import.meta.dirname })\napp.register(AppServiceProvider)\nawait app.boot()  // .env loaded here, all providers booted\n\nconst router = new Router()\n\nrouter.get('/', (ctx) =>\n  ctx.response.json({ message: 'Welcome to Pearl 🦪' })\n)\n\nawait new HttpKernel()\n  .useRouter(router)\n  .listen(Number(process.env.PORT ?? 3000))\n\nconsole.log('🦪 Pearl running on http://localhost:3000')`} />
+      <CodeBlock lang="typescript" filename="src/server.ts" code={`import 'dotenv/config'\nimport { Application, HttpKernel, Router } from '@pearl-framework/pearl'\nimport { AppServiceProvider } from './providers/AppServiceProvider.js'\n\nconst app = new Application({ root: import.meta.dirname })\napp.register(AppServiceProvider)\nawait app.boot()  // all providers booted\n\nconst router = new Router()\n\nrouter.get('/', (ctx) =>\n  ctx.response.json({ message: 'Welcome to Pearl 🦪' })\n)\n\nawait new HttpKernel()\n  .useRouter(router)\n  .listen(Number(process.env.PORT ?? 3000))\n\nconsole.log('🦪 Pearl running on http://localhost:3000')`} />
 
       <h2 id="service-providers">Service providers</h2>
       <p>
@@ -81,7 +81,7 @@ export default function GettingStartedPage() {
           <code>.env</code> is loaded. Safe for async work like opening DB connections.
         </li>
       </ul>
-      <CodeBlock lang="typescript" filename="src/providers/AppServiceProvider.ts" code={`import { ServiceProvider, DatabaseManager } from '@pearl-framework/pearl'\n\nexport class AppServiceProvider extends ServiceProvider {\n  register(): void {\n    // Bind DatabaseManager as a singleton — constructed once, reused everywhere\n    this.container.singleton(DatabaseManager, () =>\n      new DatabaseManager({\n        driver:   'postgres',\n        host:     process.env.DB_HOST     ?? 'localhost',\n        port:     Number(process.env.DB_PORT ?? 5432),\n        user:     process.env.DB_USER     ?? 'postgres',\n        password: process.env.DB_PASSWORD ?? '',\n        database: process.env.DB_NAME     ?? 'my_api',\n      })\n    )\n  }\n\n  override async boot(): Promise<void> {\n    // .env is loaded by this point — safe to read env vars and connect\n    await this.container.make(DatabaseManager).connect()\n  }\n}`} />
+      <CodeBlock lang="typescript" filename="src/providers/AppServiceProvider.ts" code={`import { ServiceProvider, DatabaseManager } from '@pearl-framework/pearl'\nimport { DrizzleAdapter } from '@pearl-framework/database'\n\nexport class AppServiceProvider extends ServiceProvider {\n  register(): void {\n    // Bind DatabaseManager as a singleton — constructed once, reused everywhere\n    this.container.singleton(DatabaseManager, () =>\n      new DatabaseManager(new DrizzleAdapter({\n        driver:   'postgres',\n        host:     process.env.DB_HOST     ?? 'localhost',\n        port:     Number(process.env.DB_PORT ?? 5432),\n        user:     process.env.DB_USER     ?? 'postgres',\n        password: process.env.DB_PASSWORD ?? '',\n        database: process.env.DB_NAME     ?? 'my_api',\n      }))\n    )\n  }\n\n  override async boot(): Promise<void> {\n    // .env is loaded by this point — safe to read env vars and connect\n    await this.container.make(DatabaseManager).connect()\n  }\n}`} />
 
       <h2 id="env">Environment variables</h2>
       <p>

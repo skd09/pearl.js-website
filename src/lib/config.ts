@@ -41,8 +41,8 @@ export const docsNav = [
     title: 'Getting Started',
     items: [
       { label: 'Introduction', href: '/docs/getting-started' },
-      { label: 'Installation', href: '/docs/getting-started#installation' },
-      { label: 'Quick Start', href: '/docs/getting-started#quick-start' },
+      { label: 'Installation', href: '/docs/getting-started#manual' },
+      { label: 'Quick Start', href: '/docs/getting-started#scaffold' },
     ],
   },
   {

@@ -11,17 +11,17 @@ export const metadata: Metadata = {
 
 /* ── Packages ────────────────────────────────────────── */
 const packages = [
-  { name: 'core',     accent: '#58a6ff', desc: 'IoC container, application kernel, service providers',            ver: '0.2.0' },
-  { name: 'http',     accent: '#00e5a0', desc: 'HTTP kernel — router, middleware pipeline, request/response',     ver: '0.2.0' },
-  { name: 'auth',     accent: '#f85149', desc: 'JWT, session, and API token authentication guards',               ver: '0.2.0' },
-  { name: 'database', accent: '#d29922', desc: 'Drizzle ORM — Postgres, MySQL, SQLite integration',              ver: '0.2.1' },
-  { name: 'validate', accent: '#bc8cff', desc: 'Zod-powered FormRequest, validation pipes, error formatting',    ver: '0.2.0' },
-  { name: 'events',   accent: '#00e5a0', desc: 'Type-safe event dispatcher, listeners, queued events',           ver: '0.2.0' },
-  { name: 'queue',    accent: '#f77f00', desc: 'BullMQ-powered job dispatching, workers, and retries',           ver: '0.2.0' },
-  { name: 'mail',     accent: '#79c0ff', desc: 'Nodemailer-powered mailable classes, transports, queue support', ver: '0.2.1' },
-  { name: 'testing',  accent: '#bc8cff', desc: 'HTTP test client, database helpers, mail fakes, test utilities', ver: '0.2.0' },
-  { name: 'cli',      accent: '#58a6ff', desc: 'CLI for scaffolding — new, serve, make:*',                      ver: '0.2.0' },
-  { name: 'pearl',    accent: '#d29922', desc: 'Meta-package — installs all packages in one command',            ver: '0.2.0' },
+  { name: 'core',     accent: '#58a6ff', desc: 'IoC container, application kernel, service providers',            ver: '1.0.0' },
+  { name: 'http',     accent: '#00e5a0', desc: 'HTTP kernel — router, middleware pipeline, request/response',     ver: '1.0.0' },
+  { name: 'auth',     accent: '#f85149', desc: 'JWT, session, and API token authentication guards',               ver: '1.0.0' },
+  { name: 'database', accent: '#d29922', desc: 'Drizzle ORM — Postgres, MySQL, SQLite integration',              ver: '1.0.0' },
+  { name: 'validate', accent: '#bc8cff', desc: 'Zod-powered FormRequest, validation pipes, error formatting',    ver: '1.0.0' },
+  { name: 'events',   accent: '#00e5a0', desc: 'Type-safe event dispatcher, listeners, queued events',           ver: '1.0.0' },
+  { name: 'queue',    accent: '#f77f00', desc: 'BullMQ-powered job dispatching, workers, and retries',           ver: '1.0.0' },
+  { name: 'mail',     accent: '#79c0ff', desc: 'Nodemailer-powered mailable classes, transports, queue support', ver: '1.0.0' },
+  { name: 'testing',  accent: '#bc8cff', desc: 'HTTP test client, database helpers, mail fakes, test utilities', ver: '1.0.0' },
+  { name: 'cli',      accent: '#58a6ff', desc: 'CLI for scaffolding — new, serve, make:*',                      ver: '1.0.0' },
+  { name: 'pearl',    accent: '#d29922', desc: 'Meta-package — installs all packages in one command',            ver: '1.0.0' },
 ]
 
 /* ── Feature sections ────────────────────────────────── */
@@ -142,7 +142,7 @@ export default function HomePage() {
                 animation: 'dot-pulse 2.5s ease-in-out infinite',
               }} />
               <span style={{ ...m, fontSize: '.72rem', color: 'var(--body)', letterSpacing: '.05em' }}>
-                v0.2.0 &nbsp;·&nbsp; 11 packages &nbsp;·&nbsp; <span style={{ color: 'var(--accent)' }}>now on npm</span>
+                v1.0.0 &nbsp;·&nbsp; 11 packages &nbsp;·&nbsp; <span style={{ color: 'var(--accent)' }}>now on npm</span>
               </span>
             </div>
 
@@ -239,7 +239,7 @@ router.<span style="color:#00e5a0">get</span>(<span style="color:#a5d6ff">'/heal
 )
 
 <em style="color:#8b949e;font-style:normal">// Protected — Bearer token required</em>
-router.<span style="color:#00e5a0">get</span>(<span style="color:#a5d6ff">'/me'</span>, ctx =&gt; ctx.<span style="color:#00e5a0">json</span>(ctx.<span style="color:#00e5a0">user</span>()),
+router.<span style="color:#00e5a0">get</span>(<span style="color:#a5d6ff">'/me'</span>, ctx =&gt; ctx.<span style="color:#00e5a0">json</span>(ctx.<span style="color:#00e5a0">get</span>(<span style="color:#a5d6ff">'auth.user'</span>)),
   [<span style="color:#00e5a0">Authenticate</span>(auth)]
 )
 
@@ -484,7 +484,7 @@ router.<span style="color:#00e5a0">get</span>(<span style="color:#a5d6ff">'/me'<
                 A batteries-included TypeScript framework for Node.js — 11 packages, one install, zero glue.
               </p>
               <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap' }}>
-                {['MIT', 'v0.2.0', 'Node ≥ 20', 'TypeScript 5+'].map(t => (
+                {['MIT', 'v1.0.0', 'Node ≥ 20', 'TypeScript 5+'].map(t => (
                   <span key={t} style={{ ...m, fontSize: '.65rem', color: 'var(--muted)', background: 'var(--bg3)', border: '1px solid var(--border)', padding: '.2rem .55rem', borderRadius: 3 }}>
                     {t}
                   </span>

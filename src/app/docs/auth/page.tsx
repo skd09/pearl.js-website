@@ -19,7 +19,7 @@ export default function AuthPage() {
       <p>
         Once a guard is registered, protect any route by passing{' '}
         <code>Authenticate(auth)</code> as middleware. Inside the handler,{' '}
-        <code>ctx.user()</code> returns the authenticated user.
+        <code>ctx.get('auth.user')</code> returns the authenticated user.
       </p>
 
       <h2 id="how-it-works">How it works</h2>
@@ -27,7 +27,7 @@ export default function AuthPage() {
         <li>You register a <code>JwtGuard</code> with a <code>UserProvider</code> (your DB logic).</li>
         <li>On login, the guard verifies credentials and issues a signed JWT.</li>
         <li>On subsequent requests, the guard reads the <code>Authorization: Bearer ...</code> header and loads the user.</li>
-        <li>Inside a protected handler, <code>ctx.user()</code> returns the authenticated user.</li>
+        <li>Inside a protected handler, <code>ctx.get('auth.user')</code> returns the authenticated user.</li>
       </ol>
 
       <h2 id="setup">Setup</h2>
@@ -43,7 +43,7 @@ export default function AuthPage() {
         Create an <code>AuthController</code> with register, login, and me methods.
         Note that <code>ctx.request.body</code> is a getter — no parentheses.
       </p>
-      <CodeBlock lang="typescript" filename="src/controllers/AuthController.ts" code={`import { Hash, JwtGuard, DatabaseManager } from '@pearl-framework/pearl'\nimport type { HttpContext } from '@pearl-framework/pearl'\nimport { users } from '../schema/users.js'\n\nexport class AuthController {\n  constructor(\n    private db:    DatabaseManager,\n    private guard: JwtGuard,\n  ) {}\n\n  // POST /auth/register\n  async register(ctx: HttpContext) {\n    const { name, email, password } = ctx.request.body as {\n      name: string; email: string; password: string\n    }\n    const [user] = await this.db.db\n      .insert(users)\n      .values({ name, email, password: await Hash.make(password) })\n      .returning()\n    const token = await this.guard.issueToken(String(user.id))\n    ctx.response.created({ token, user })\n  }\n\n  // POST /auth/login\n  async login(ctx: HttpContext) {\n    const { email, password } = ctx.request.body as {\n      email: string; password: string\n    }\n    const user = await this.guard.attempt(email, password)\n    if (!user) return ctx.response.unauthorized('Invalid email or password')\n    const token = await this.guard.issueToken(String(user.id))\n    ctx.response.json({ token, user })\n  }\n\n  // GET /auth/me  — protected route\n  async me(ctx: HttpContext) {\n    ctx.response.json(ctx.user())\n  }\n}`} />
+      <CodeBlock lang="typescript" filename="src/controllers/AuthController.ts" code={`import { Hash, JwtGuard, DatabaseManager } from '@pearl-framework/pearl'\nimport type { HttpContext } from '@pearl-framework/pearl'\nimport { users } from '../schema/users.js'\n\nexport class AuthController {\n  constructor(\n    private db:    DatabaseManager,\n    private guard: JwtGuard,\n  ) {}\n\n  // POST /auth/register\n  async register(ctx: HttpContext) {\n    const { name, email, password } = ctx.request.body as {\n      name: string; email: string; password: string\n    }\n    const [user] = await (this.db.adapter as DrizzleAdapter).db\n      .insert(users)\n      .values({ name, email, password: await Hash.make(password) })\n      .returning()\n    const token = await this.guard.issueToken(String(user.id))\n    ctx.response.created({ token, user })\n  }\n\n  // POST /auth/login\n  async login(ctx: HttpContext) {\n    const { email, password } = ctx.request.body as {\n      email: string; password: string\n    }\n    const user = await this.guard.attempt(email, password)\n    if (!user) return ctx.response.unauthorized('Invalid email or password')\n    const token = await this.guard.issueToken(String(user.id))\n    ctx.response.json({ token, user })\n  }\n\n  // GET /auth/me  — protected route\n  async me(ctx: HttpContext) {\n    ctx.response.json(ctx.get('auth.user'))\n  }\n}`} />
 
       <h2 id="protecting-routes">Protecting routes</h2>
       <p>
@@ -62,10 +62,10 @@ export default function AuthPage() {
       <h2 id="optional-auth">Optional auth</h2>
       <p>
         Use <code>OptionalAuth(auth)</code> when a route should work for both guests and
-        authenticated users. <code>ctx.user()</code> returns the user if a valid token is
+        authenticated users. <code>ctx.get('auth.user')</code> returns the user if a valid token is
         present, or <code>null</code> if not — no 401 is sent.
       </p>
-      <CodeBlock lang="typescript" code={`import { OptionalAuth } from '@pearl-framework/pearl'\n\nrouter.get('/feed', async (ctx) => {\n  const user = ctx.user()  // User | null\n  ctx.response.json(buildFeed(user))\n}, [OptionalAuth(auth)])`} />
+      <CodeBlock lang="typescript" code={`import { OptionalAuth } from '@pearl-framework/pearl'\n\nrouter.get('/feed', async (ctx) => {\n  const user = ctx.get('auth.user')  // AuthUser | null\n  ctx.response.json(buildFeed(user))\n}, [OptionalAuth(auth)])`} />
 
       <h2 id="password-hashing">Password hashing</h2>
       <p>
