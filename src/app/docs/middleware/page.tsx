@@ -94,6 +94,25 @@ export async function ErrorHandlerMiddleware(ctx: HttpContext, next: NextFunctio
   }
 }`} />
 
+      <h2 id="rate-limit">Built-in: rate limiting</h2>
+      <p>
+        Pearl ships a <code>RateLimit</code> middleware out of the box — fixed window,
+        per-key, with <code>X-RateLimit-*</code> and <code>Retry-After</code> headers
+        on 429 responses. The default store is in-memory; swap in a Redis-backed
+        store for multi-process deployments.
+      </p>
+      <CodeBlock lang="typescript" code={`import { RateLimit } from '@pearl-framework/pearl'\n\n// Global — 100 requests per minute per IP\nrouter.use(new RateLimit({ windowMs: 60_000, max: 100 }))\n\n// Per-route — tight limit on the login endpoint\nrouter.post('/auth/login', loginHandler, [\n  new RateLimit({\n    windowMs: 15 * 60_000,\n    max:      5,\n    message:  'Too many login attempts. Try again in 15 minutes.',\n  }),\n])`} />
+      <p>
+        Customize the key (e.g. per-user instead of per-IP) by passing{' '}
+        <code>keyGenerator</code>:
+      </p>
+      <CodeBlock lang="typescript" code={`new RateLimit({\n  windowMs: 60_000,\n  max:      30,\n  keyGenerator: (ctx) => {\n    const user = ctx.get<{ id: number }>('auth.user')\n    return user ? \`u:\${user.id}\` : \`ip:\${ctx.request.header('x-forwarded-for') ?? 'unknown'}\`\n  },\n})`} />
+      <p>
+        For multi-process deployments, implement <code>RateLimitStore</code> against
+        Redis and pass it via the <code>store</code> option — the same middleware then
+        rate-limits consistently across every instance.
+      </p>
+
       <h2 id="applying">Applying middleware</h2>
       <p>
         Use <code>router.use()</code> for global middleware (runs on every request) and pass

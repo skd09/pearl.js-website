@@ -62,6 +62,15 @@ export default function MailPage() {
       <h2 id="attachments">Attachments</h2>
       <CodeBlock lang="typescript" code={`build() {\n  return this\n    .sendTo(this.user.email)\n    .subject('Your invoice')\n    .html('<p>Please find your invoice attached.</p>')\n    .attach({\n      filename:    'invoice.pdf',\n      path:        \`/tmp/invoices/\${this.invoiceId}.pdf\`,\n      contentType: 'application/pdf',\n    })\n}`} />
 
+      <h2 id="bulk">Sending in bulk</h2>
+      <p>
+        Use <code>sendBulk</code> when you have many mailables to send. It runs sends
+        in parallel with a bounded concurrency so you don't exhaust SMTP connections.
+        The default cap is 10 — override via the <code>concurrency</code> option, or
+        set <code>defaultBulkConcurrency</code> on your <code>Mailer</code>.
+      </p>
+      <CodeBlock lang="typescript" code={`// Fail fast on the first error (default)\nawait mailer.sendBulk(mailables, { concurrency: 20 })\n\n// Collect errors instead of aborting\nconst result = await mailer.sendBulk(mailables, {\n  concurrency:     20,\n  continueOnError: true,\n})\nconsole.log(\`Sent \${result.sent} mails, \${result.errors.length} failures\`)\nresult.errors.forEach(({ index, error }) =>\n  console.error(\`#\${index} failed:\`, error)\n)`} />
+
       <h2 id="testing">Testing with ArrayTransport</h2>
       <p>
         Swap in <code>ArrayTransport</code> in tests to capture sent mail in memory and

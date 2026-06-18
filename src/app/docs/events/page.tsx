@@ -50,6 +50,15 @@ export default function EventsPage() {
       </p>
       <CodeBlock lang="typescript" code={`const dispatcher = app.container.make(EventDispatcher)\n\n// Dispatches and awaits all listeners\nawait dispatcher.dispatch(new UserRegisteredEvent(user.id, user.email))\n\n// Fire-and-forget — does not await listeners\ndispatcher.dispatchSync(new UserRegisteredEvent(user.id, user.email))`} />
 
+      <h2 id="error-handling">Handling listener errors</h2>
+      <p>
+        <code>dispatch()</code> rejects when a listener throws — you handle it like
+        any await. <code>dispatchSync()</code> is fire-and-forget; by default it logs
+        to <code>console.error</code>, but you can register an <code>onError</code>{' '}
+        handler so APMs (Sentry, Datadog, etc.) can observe the failure:
+      </p>
+      <CodeBlock lang="typescript" filename="src/providers/AppServiceProvider.ts" code={`this.container.singleton(EventDispatcher, () => {\n  const dispatcher = new EventDispatcher()\n  dispatcher.onError((err, event) => {\n    Sentry.captureException(err, { tags: { event: event.constructor.name } })\n  })\n  // ... register listeners\n  return dispatcher\n})`} />
+
       <h2 id="tip">Why use events?</h2>
       <p>
         Without events, your registration handler is tightly coupled to every side effect:
