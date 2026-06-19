@@ -211,6 +211,20 @@ pre code { background: none; border: none; padding: 0; font-size: inherit; color
 }
 
 /* ── Prose (docs) ───────────────────────────────────── */
+/* Code surfaces inside docs use a deeper bg so they read as distinct
+   "panels" against the page. Scoped to .prose so homepage code windows
+   keep their original lighter tone. */
+.prose pre,
+.prose .code-win,
+.prose .code-win pre {
+  background: #06080d !important;
+  border-color: var(--bg4) !important;
+}
+.prose .code-win-bar {
+  background: #0a0d13;
+  border-bottom-color: var(--bg4);
+}
+
 .prose h1 { font-size: 2rem; font-weight: 700; color: var(--text); letter-spacing: -.02em; margin-bottom: .5rem; }
 .prose h2 { font-size: 1.25rem; font-weight: 600; color: var(--text); margin-top: 2.5rem; margin-bottom: .75rem; padding-bottom: .5rem; border-bottom: 1px solid var(--border); }
 .prose h2::before { content: '## '; font-family: var(--mono); color: var(--muted); font-size: .9em; }
