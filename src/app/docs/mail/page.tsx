@@ -27,7 +27,7 @@ export default function MailPage() {
       <p>
         Implement the <code>build()</code> method and chain the fluent helpers:
       </p>
-      <CodeBlock lang="typescript" filename="src/mail/WelcomeMail.ts" code={`import { Mailable } from '@pearl-framework/pearl'\n\nexport class WelcomeMail extends Mailable {\n  constructor(private readonly user: User) {\n    super()\n  }\n\n  build() {\n    return this\n      .sendTo(this.user.email)\n      .from({ name: 'My App', address: 'hi@myapp.com' })\n      .subject(\`Welcome to My App, \${this.user.name}!\`)\n      .html(\`\n        <h1>Hi \${this.user.name}, welcome aboard! 🎉</h1>\n        <p>Thanks for signing up. You're all set to get started.</p>\n        <a href="https://myapp.com/dashboard">Go to your dashboard →</a>\n      \`)\n      .text(\`Hi \${this.user.name}, welcome! Visit https://myapp.com/dashboard\`)\n  }\n}`} />
+      <CodeBlock lang="typescript" filename="src/mail/WelcomeMail.ts" code={`import { Mailable } from '@pearl-framework/pearl'\n\nexport class WelcomeMail extends Mailable {\n  constructor(private readonly user: User) {\n    super()\n  }\n\n  build() {\n    return this\n      .sendTo(this.user.email)\n      .from({ name: 'My App', address: 'hi@myapp.com' })\n      .subject(\`Welcome to My App, \${this.user.name}!\`)\n      .html(\`\n        <h1>Hi \${this.user.name}, welcome aboard.</h1>\n        <p>Thanks for signing up. You're all set to get started.</p>\n        <a href="https://myapp.com/dashboard">Go to your dashboard</a>\n      \`)\n      .text(\`Hi \${this.user.name}, welcome! Visit https://myapp.com/dashboard\`)\n  }\n}`} />
 
       <h2 id="sending">Sending mail</h2>
       <CodeBlock lang="typescript" code={`import { Mailer, LogTransport } from '@pearl-framework/pearl'\nimport { WelcomeMail } from '../mail/WelcomeMail.js'\n\nconst mailer = new Mailer(new LogTransport())  // logs to console — great for dev\n\nawait mailer.send(new WelcomeMail(user))`} />
@@ -83,7 +83,7 @@ export default function MailPage() {
         SMTP calls can be slow and fail. Instead of sending in your route handler,
         dispatch a queue job to send in the background:
       </p>
-      <CodeBlock lang="typescript" code={`// ❌ Blocks the response — slow and fragile\nawait mailer.send(new WelcomeMail(user.email))\n\n// ✅ Returns immediately — job runs in the background\nconst job = new SendWelcomeEmailJob()\njob.userId = user.id\nawait queue.dispatch(job)`} />
+      <CodeBlock lang="typescript" code={`// Avoid: blocks the response — slow and fragile\nawait mailer.send(new WelcomeMail(user.email))\n\n// Prefer: returns immediately — job runs in the background\nconst job = new SendWelcomeEmailJob()\njob.userId = user.id\nawait queue.dispatch(job)`} />
     </>
   )
 }

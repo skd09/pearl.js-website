@@ -46,17 +46,17 @@ await new HttpKernel().useRouter(router).listen(3000)
 
 ## Features
 
-| | |
+| Capability | What you get |
 |---|---|
-| 🔀 **Routing** | Express-inspired router with typed params, middleware chains, and response helpers |
-| 🔐 **Authentication** | JWT guard with pluggable user providers — register, login, protect routes in minutes |
-| 🗃️ **Database** | Drizzle ORM wrapped in a `DatabaseManager` — Postgres, MySQL, SQLite |
-| ✅ **Validation** | Zod-powered `FormRequest` classes — validate and type your request bodies cleanly |
-| 📬 **Mail** | `Mailable` classes with SMTP and log transports |
-| 📣 **Events** | Typed, synchronous event dispatcher — decouple your services |
-| 🏗️ **Queues** | BullMQ-backed job queue — dispatch background jobs with delay and retry |
-| 💉 **IoC Container** | Lightweight service container — bind, singleton, make |
-| 🛠️ **CLI** | Scaffold projects and generate controllers, middleware, jobs, and more |
+| **Routing** | Express-inspired router with typed params, middleware chains, and response helpers |
+| **Authentication** | JWT guard with pluggable user providers — register, login, protect routes in minutes |
+| **Database** | Drizzle ORM wrapped in a `DatabaseManager` — Postgres, MySQL, SQLite |
+| **Validation** | Zod-powered `FormRequest` classes — validate and type your request bodies cleanly |
+| **Mail** | `Mailable` classes with SMTP and log transports |
+| **Events** | Typed, synchronous event dispatcher — decouple your services |
+| **Queues** | BullMQ-backed job queue — dispatch background jobs with delay and retry |
+| **IoC Container** | Lightweight service container — bind, singleton, make |
+| **CLI** | Scaffold projects and generate controllers, middleware, jobs, and more |
 
 ## Quick Start
 
