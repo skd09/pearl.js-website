@@ -48,8 +48,10 @@ export default function ValidationPage() {
       <h2 id="authorization">Authorization</h2>
       <p>
         Override <code>authorize()</code> to enforce access control before validation runs.
-        Returning <code>false</code> sends a <code>403 Forbidden</code> immediately:
+        Returning <code>false</code> sends a <code>403 Forbidden</code> immediately and
+        throws a typed <code>AuthorizationException</code>:
       </p>
+      <CodeBlock lang="typescript" code={`import { AuthorizationException, ValidationException } from '@pearl-framework/pearl'\n\n// In your error-handler middleware:\nif (err instanceof AuthorizationException) {\n  // already a 403 — body is err.toJSON()\n  return\n}\nif (err instanceof ValidationException) {\n  // already a 422\n  return\n}`} />
       <CodeBlock lang="typescript" filename="src/requests/UpdatePostRequest.ts" code={`export class UpdatePostRequest extends FormRequest {\n  schema = z.object({\n    title:   z.string().min(3).max(255),\n    content: z.string().min(10),\n  })\n\n  async authorize(): Promise<boolean> {\n    const user = this.ctx.user()\n    const post = await Post.find(db, this.ctx.request.param('id'))\n    return post?.userId === user?.id  // only the author can update\n  }\n}`} />
 
       <h2 id="zod-rules">Common Zod validation rules</h2>

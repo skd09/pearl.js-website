@@ -29,39 +29,97 @@ export const siteConfig = {
 
 export const navLinks = [
   { label: 'Docs', href: '/docs/getting-started' },
-  { label: 'Routing', href: '/docs/routing' },
-  { label: 'Database', href: '/docs/database' },
-  { label: 'Auth', href: '/docs/auth' },
   { label: 'GitHub', href: 'https://github.com/skd09/pearl.js', external: true },
   { label: 'npm', href: 'https://www.npmjs.com/package/@pearl-framework/pearl', external: true },
 ]
 
-export const docsNav = [
+/* ── Footer ──────────────────────────────────────────── */
+export interface FooterLink {
+  label: string
+  href: string
+  external?: boolean
+}
+
+export const footerTagline =
+  'A TypeScript framework for Node.js backends. Routing, auth, validation, queues, mail, and events — already integrated.'
+
+export const footerBadges = ['MIT licensed', 'v1.0.0', 'Node 20+', 'TypeScript 5+']
+
+export const footerSections: { title: string; links: FooterLink[] }[] = [
+  {
+    title: 'Docs',
+    links: [
+      { label: 'Getting Started', href: '/docs/getting-started' },
+      { label: 'Routing',         href: '/docs/routing' },
+      { label: 'Controllers',     href: '/docs/controllers' },
+      { label: 'Middleware',      href: '/docs/middleware' },
+      { label: 'Validation',      href: '/docs/validation' },
+      { label: 'Database',        href: '/docs/database' },
+      { label: 'Authentication',  href: '/docs/auth' },
+      { label: 'Events',          href: '/docs/events' },
+      { label: 'Queues',          href: '/docs/queue' },
+      { label: 'Mail',            href: '/docs/mail' },
+      { label: 'CLI',             href: '/docs/cli' },
+    ],
+  },
+  {
+    title: 'Project',
+    links: [
+      { label: 'GitHub',         href: siteConfig.github,                       external: true },
+      { label: 'npm',            href: siteConfig.npm,                          external: true },
+      { label: 'Issues',         href: `${siteConfig.github}/issues`,           external: true },
+      { label: 'Discussions',    href: `${siteConfig.github}/discussions`,      external: true },
+      { label: 'License',        href: `${siteConfig.github}/blob/main/LICENSE`, external: true },
+    ],
+  },
+  {
+    title: 'Community',
+    links: [
+      { label: 'Twitter / X',    href: 'https://twitter.com/SharvariDivekar',   external: true },
+      { label: 'Portfolio',      href: siteConfig.portfolio,                    external: true },
+      { label: 'Contact',        href: `mailto:hello@sharvari.dev` },
+    ],
+  },
+]
+
+export interface DocsNavItem {
+  label: string
+  href: string
+}
+
+export interface DocsNavSection {
+  title: string
+  items: DocsNavItem[]
+}
+
+/**
+ * Pages only — no anchor sub-items. Per-page sections are rendered
+ * by `<DocsTOC>` (right rail) reading h2[id]s from the article.
+ */
+export const docsNav: DocsNavSection[] = [
   {
     title: 'Getting Started',
     items: [
       { label: 'Introduction', href: '/docs/getting-started' },
-      { label: 'Installation', href: '/docs/getting-started#manual' },
-      { label: 'Quick Start', href: '/docs/getting-started#scaffold' },
     ],
   },
   {
     title: 'Core',
     items: [
-      { label: 'Routing', href: '/docs/routing' },
+      { label: 'Routing',     href: '/docs/routing' },
       { label: 'Controllers', href: '/docs/controllers' },
-      { label: 'Middleware', href: '/docs/middleware' },
-      { label: 'Validation', href: '/docs/validation' },
+      { label: 'Middleware',  href: '/docs/middleware' },
+      { label: 'Validation',  href: '/docs/validation' },
     ],
   },
   {
     title: 'Features',
     items: [
-      { label: 'Database', href: '/docs/database' },
+      { label: 'Database',       href: '/docs/database' },
       { label: 'Authentication', href: '/docs/auth' },
-      { label: 'Events', href: '/docs/events' },
-      { label: 'Queues', href: '/docs/queue' },
-      { label: 'Mail', href: '/docs/mail' },
+      { label: 'Events',         href: '/docs/events' },
+      { label: 'Queues',         href: '/docs/queue' },
+      { label: 'Mail',           href: '/docs/mail' },
     ],
   },
   {

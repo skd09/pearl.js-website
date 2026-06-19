@@ -51,6 +51,23 @@ export default function QueuePage() {
       <CodeBlock lang="typescript" code={`// High-priority — 10 concurrent workers\nexport class ProcessPayment extends Job {\n  readonly queue = 'critical'\n  paymentId!: number\n  async handle() { /* ... */ }\n}\n\n// Low-priority — 1 worker\nexport class GenerateReport extends Job {\n  readonly queue = 'reports'\n  reportId!: number\n  async handle() { /* ... */ }\n}`} />
       <CodeBlock lang="typescript" filename="src/providers/AppServiceProvider.ts" code={`workers: [\n  { queue: 'default',  concurrency: 5  },\n  { queue: 'critical', concurrency: 10 },\n  { queue: 'reports',  concurrency: 1  },\n]`} />
 
+      <h2 id="unknown-jobs">Handling unknown jobs</h2>
+      <p>
+        If a job arrives whose class isn't registered on this worker, the worker logs
+        the failure by default. Pass an <code>onUnknownJob</code> hook to route it
+        somewhere useful — alerting, Sentry, a dead-letter queue:
+      </p>
+      <CodeBlock lang="typescript" code={`new QueueWorker('default', {\n  connection,\n  onUnknownJob: (name, data, error) => {\n    Sentry.captureException(error, { tags: { jobName: name } })\n  },\n})`} />
+
+      <h2 id="retry-utils">Retry & backoff utilities</h2>
+      <p>
+        For one-off async ops (HTTP calls, external API hits) that aren't worth a
+        full queue job, use <code>retryWith</code> plus a backoff strategy. For
+        BullMQ-managed retries, override <code>jobOptions.backoff</code> on your Job
+        instead — the queue handles re-enqueue itself.
+      </p>
+      <CodeBlock lang="typescript" code={`import {\n  retryWith,\n  fixedBackoff,\n  linearBackoff,\n  exponentialBackoff,\n} from '@pearl-framework/pearl'\n\n// Exponential with jitter — recommended for external services\nconst result = await retryWith(() => fetchExternalApi(url), {\n  attempts: 5,\n  backoff:  exponentialBackoff({ base: 500, maxDelay: 10_000, jitterPercent: 0.2 }),\n  shouldRetry: (err) => isTransient(err),\n  onRetry:     (err, attempt, delay) => log.warn(\`retry #\${attempt} in \${delay}ms\`),\n})\n\n// Other strategies\nfixedBackoff(1000)               // 1s every time\nlinearBackoff(500, 10_000)       // 500ms, 1s, 1.5s, ... capped at 10s`} />
+
       <h2 id="custom-options">Custom BullMQ options</h2>
       <p>
         Override <code>jobOptions</code> on a job class for full control over BullMQ

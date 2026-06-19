@@ -67,6 +67,24 @@ export default function AuthPage() {
       </p>
       <CodeBlock lang="typescript" code={`import { OptionalAuth } from '@pearl-framework/pearl'\n\nrouter.get('/feed', async (ctx) => {\n  const user = ctx.get('auth.user')  // AuthUser | null\n  ctx.response.json(buildFeed(user))\n}, [OptionalAuth(auth)])`} />
 
+      <h2 id="session-guard">Session guard (cookie-based auth)</h2>
+      <p>
+        Prefer cookies over Bearer tokens? Use <code>SessionGuard</code>. It issues an
+        opaque session id you can write to a cookie, validates it on every request,
+        and supports rotation-on-use and "log out all devices".
+      </p>
+      <CodeBlock lang="typescript" filename="src/providers/AppServiceProvider.ts" code={`import { SessionGuard, AuthManager } from '@pearl-framework/pearl'\nimport type { SessionStore, UserProvider } from '@pearl-framework/pearl'\n\n// Provide your own store — Redis, DB table, etc.\nconst store: SessionStore = {\n  async find(id)         { /* ... */ },\n  async save(record)     { /* ... */ },\n  async destroy(id)      { /* ... */ },\n  async destroyAll(uid)  { /* ... */ },\n}\n\nthis.container.singleton(SessionGuard, () =>\n  new SessionGuard(userProvider, store, {\n    lifetimeSeconds: 60 * 60 * 2,  // 2h\n    rotateOnUse:      true,        // issue a fresh id on every successful check\n  })\n)`} />
+      <CodeBlock lang="typescript" code={`// Login — issue a session and set the cookie\nconst id = await guard.attempt(email, password)\nif (!id) return ctx.response.unauthorized()\nctx.response.header('set-cookie', \`sid=\${id}; HttpOnly; Secure; SameSite=Lax\`)\nctx.response.ok({ ok: true })\n\n// Logout — destroy this session\nawait guard.logout(id)\n\n// "Log out everywhere" — destroy every session for the user\nawait guard.logoutAll(user)`} />
+
+      <h2 id="form-request-auth">FormRequest authorization errors</h2>
+      <p>
+        When a <code>FormRequest.authorize()</code> returns <code>false</code>, Pearl
+        throws a typed <code>AuthorizationException</code> (instead of a plain{' '}
+        <code>Error</code>). Use it to distinguish auth failures from validation failures
+        in your error-handler middleware:
+      </p>
+      <CodeBlock lang="typescript" code={`import { ValidationException, AuthorizationException } from '@pearl-framework/pearl'\n\nif (err instanceof AuthorizationException) {\n  return ctx.response.status(403).json(err.toJSON())\n}\nif (err instanceof ValidationException) {\n  return ctx.response.status(422).json({ errors: err.errors })\n}`} />
+
       <h2 id="password-hashing">Password hashing</h2>
       <p>
         Use the built-in <code>Hash</code> utility — bcrypt under the hood. Never store
