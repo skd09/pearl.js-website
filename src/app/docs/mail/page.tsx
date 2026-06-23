@@ -27,7 +27,7 @@ export default function MailPage() {
       <p>
         Implement the <code>build()</code> method and chain the fluent helpers:
       </p>
-      <CodeBlock lang="typescript" filename="src/mail/WelcomeMail.ts" code={`import { Mailable } from '@pearl-framework/pearl'\n\nexport class WelcomeMail extends Mailable {\n  constructor(private readonly user: User) {\n    super()\n  }\n\n  build() {\n    return this\n      .sendTo(this.user.email)\n      .from({ name: 'My App', address: 'hi@myapp.com' })\n      .subject(\`Welcome to My App, \${this.user.name}!\`)\n      .html(\`\n        <h1>Hi \${this.user.name}, welcome aboard! 🎉</h1>\n        <p>Thanks for signing up. You're all set to get started.</p>\n        <a href="https://myapp.com/dashboard">Go to your dashboard →</a>\n      \`)\n      .text(\`Hi \${this.user.name}, welcome! Visit https://myapp.com/dashboard\`)\n  }\n}`} />
+      <CodeBlock lang="typescript" filename="src/mail/WelcomeMail.ts" code={`import { Mailable } from '@pearl-framework/pearl'\n\nexport class WelcomeMail extends Mailable {\n  constructor(private readonly user: User) {\n    super()\n  }\n\n  build() {\n    return this\n      .sendTo(this.user.email)\n      .from({ name: 'My App', address: 'hi@myapp.com' })\n      .subject(\`Welcome to My App, \${this.user.name}!\`)\n      .html(\`\n        <h1>Hi \${this.user.name}, welcome aboard.</h1>\n        <p>Thanks for signing up. You're all set to get started.</p>\n        <a href="https://myapp.com/dashboard">Go to your dashboard</a>\n      \`)\n      .text(\`Hi \${this.user.name}, welcome! Visit https://myapp.com/dashboard\`)\n  }\n}`} />
 
       <h2 id="sending">Sending mail</h2>
       <CodeBlock lang="typescript" code={`import { Mailer, LogTransport } from '@pearl-framework/pearl'\nimport { WelcomeMail } from '../mail/WelcomeMail.js'\n\nconst mailer = new Mailer(new LogTransport())  // logs to console — great for dev\n\nawait mailer.send(new WelcomeMail(user))`} />
@@ -60,7 +60,22 @@ export default function MailPage() {
       <CodeBlock lang="bash" filename=".env" code={`MAIL_HOST=smtp.postmarkapp.com\nMAIL_PORT=587\nMAIL_USER=your-api-token\nMAIL_PASS=your-api-token`} />
 
       <h2 id="attachments">Attachments</h2>
-      <CodeBlock lang="typescript" code={`build() {\n  return this\n    .sendTo(this.user.email)\n    .subject('Your invoice')\n    .html('<p>Please find your invoice attached.</p>')\n    .attach({\n      filename:    'invoice.pdf',\n      path:        \`/tmp/invoices/\${this.invoiceId}.pdf\`,\n      contentType: 'application/pdf',\n    })\n}`} />
+      <p>
+        Read the file yourself and pass the bytes via <code>content</code>. The SMTP
+        transport refuses path-based and URL-based attachments by default (see the
+        security note below).
+      </p>
+      <CodeBlock lang="typescript" code={`import { readFile } from 'node:fs/promises'\n\nasync build() {\n  return this\n    .sendTo(this.user.email)\n    .subject('Your invoice')\n    .html('<p>Please find your invoice attached.</p>')\n    .attach({\n      filename:    'invoice.pdf',\n      content:     await readFile(\`/tmp/invoices/\${this.invoiceId}.pdf\`),\n      contentType: 'application/pdf',\n    })\n}`} />
+      <div className="my-4 rounded-md border border-amber-500/30 bg-amber-500/5 p-4 text-sm">
+        <strong className="text-amber-300">Security — attachment fetching is off by default.</strong>
+        {' '}<code>SmtpTransport</code> configures nodemailer with{' '}
+        <code>disableFileAccess: true</code> and <code>disableUrlAccess: true</code>, so
+        passing <code>path</code> or <code>href</code> on an attachment will fail. This
+        prevents an attacker who controls part of an attachment from reading arbitrary
+        local files or triggering SSRF against internal endpoints. If you genuinely need
+        path/URL fetching, build a custom transport that wraps nodemailer without these
+        flags.
+      </div>
 
       <h2 id="bulk">Sending in bulk</h2>
       <p>
@@ -83,7 +98,7 @@ export default function MailPage() {
         SMTP calls can be slow and fail. Instead of sending in your route handler,
         dispatch a queue job to send in the background:
       </p>
-      <CodeBlock lang="typescript" code={`// ❌ Blocks the response — slow and fragile\nawait mailer.send(new WelcomeMail(user.email))\n\n// ✅ Returns immediately — job runs in the background\nconst job = new SendWelcomeEmailJob()\njob.userId = user.id\nawait queue.dispatch(job)`} />
+      <CodeBlock lang="typescript" code={`// Avoid: blocks the response — slow and fragile\nawait mailer.send(new WelcomeMail(user.email))\n\n// Prefer: returns immediately — job runs in the background\nconst job = new SendWelcomeEmailJob()\njob.userId = user.id\nawait queue.dispatch(job)`} />
     </>
   )
 }

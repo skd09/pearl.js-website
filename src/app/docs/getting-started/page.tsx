@@ -61,7 +61,7 @@ export default function GettingStartedPage() {
           project root is so it can find config files. Don't remove it.
         </li>
       </ul>
-      <CodeBlock lang="typescript" filename="src/server.ts" code={`import 'dotenv/config'\nimport { Application, HttpKernel, Router } from '@pearl-framework/pearl'\nimport { AppServiceProvider } from './providers/AppServiceProvider.js'\n\nconst app = new Application({ root: import.meta.dirname })\napp.register(AppServiceProvider)\nawait app.boot()  // all providers booted\n\nconst router = new Router()\n\nrouter.get('/', (ctx) =>\n  ctx.response.json({ message: 'Welcome to Pearl 🦪' })\n)\n\nawait new HttpKernel()\n  .useRouter(router)\n  .listen(Number(process.env.PORT ?? 3000))\n\nconsole.log('🦪 Pearl running on http://localhost:3000')`} />
+      <CodeBlock lang="typescript" filename="src/server.ts" code={`import 'dotenv/config'\nimport { Application, HttpKernel, Router } from '@pearl-framework/pearl'\nimport { AppServiceProvider } from './providers/AppServiceProvider.js'\n\nconst app = new Application({ root: import.meta.dirname })\napp.register(AppServiceProvider)\nawait app.boot()  // all providers booted\n\nconst router = new Router()\n\nrouter.get('/', (ctx) =>\n  ctx.response.json({ message: 'Welcome to Pearl.js' })\n)\n\nawait new HttpKernel()\n  .useRouter(router)\n  .listen(Number(process.env.PORT ?? 3000))\n\nconsole.log('Pearl.js running on http://localhost:3000')`} />
 
       <h2 id="service-providers">Service providers</h2>
       <p>

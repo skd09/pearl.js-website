@@ -94,7 +94,7 @@ pearl make:migration create_posts_table
         <code>.ts</code> file restarts the server automatically:
       </p>
       <CodeBlock lang="bash" code={`pearl serve
-# 🦪 Pearl running on http://localhost:3000
+# Pearl.js running on http://localhost:3000
 # Watching for changes...`} />
     </>
   )

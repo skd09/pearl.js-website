@@ -33,7 +33,7 @@ export default function QueuePage() {
         and then restores data via <code>Object.assign</code>. Constructor arguments are
         lost after serialization.
       </p>
-      <CodeBlock lang="typescript" filename="src/jobs/SendWelcomeEmailJob.ts" code={`import { Job } from '@pearl-framework/pearl'\n\nexport class SendWelcomeEmailJob extends Job {\n  readonly queue   = 'mail'\n  get tries()      { return 3 }\n  get retryDelay() { return 2_000 }  // ms — doubles on each retry\n\n  // ✅ Payload as plain properties\n  userId!: number\n\n  async handle(): Promise<void> {\n    const user = await User.find(db, this.userId)\n    if (!user) return\n    await mailer.send(new WelcomeMail(user))\n  }\n\n  async failed(error: Error): Promise<void> {\n    // Called when all retry attempts are exhausted\n    console.error(\`SendWelcomeEmailJob failed for user \${this.userId}:\`, error.message)\n  }\n}`} />
+      <CodeBlock lang="typescript" filename="src/jobs/SendWelcomeEmailJob.ts" code={`import { Job } from '@pearl-framework/pearl'\n\nexport class SendWelcomeEmailJob extends Job {\n  readonly queue   = 'mail'\n  get tries()      { return 3 }\n  get retryDelay() { return 2_000 }  // ms — doubles on each retry\n\n  // Payload as plain properties\n  userId!: number\n\n  async handle(): Promise<void> {\n    const user = await User.find(db, this.userId)\n    if (!user) return\n    await mailer.send(new WelcomeMail(user))\n  }\n\n  async failed(error: Error): Promise<void> {\n    // Called when all retry attempts are exhausted\n    console.error(\`SendWelcomeEmailJob failed for user \${this.userId}:\`, error.message)\n  }\n}`} />
 
       <h2 id="dispatch">Dispatch a job</h2>
       <p>

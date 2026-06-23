@@ -43,7 +43,12 @@ export interface FooterLink {
 export const footerTagline =
   'A TypeScript framework for Node.js backends. Routing, auth, validation, queues, mail, and events — already integrated.'
 
-export const footerBadges = ['MIT licensed', 'v1.0.0', 'Node 20+', 'TypeScript 5+']
+/**
+ * Static badges shown in the footer. The version badge is injected by
+ * `<Footer version={...} />` so it stays in sync with the live npm version
+ * (see `src/lib/version.ts`).
+ */
+export const footerBadges = ['MIT licensed', 'Node 20+', 'TypeScript 5+']
 
 export const footerSections: { title: string; links: FooterLink[] }[] = [
   {
