@@ -3,7 +3,10 @@ import { footerBadges, footerSections, footerTagline, siteConfig } from '@/lib/c
 
 const mono: React.CSSProperties = { fontFamily: 'var(--mono)' }
 
-export function Footer() {
+export function Footer({ version }: { version: string }) {
+  // Splice the live version badge into the second slot, between "MIT licensed"
+  // and the static rest, so the visual order matches the legacy footer.
+  const badges = [footerBadges[0], `v${version}`, ...footerBadges.slice(1)]
   return (
     <footer
       role="contentinfo"
@@ -33,7 +36,7 @@ export function Footer() {
             {footerTagline}
           </p>
           <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap' }}>
-            {footerBadges.map((t) => (
+            {badges.map((t) => (
               <span
                 key={t}
                 style={{

@@ -1,34 +1,40 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Zap, Braces, FolderTree, ShieldCheck, Route, Database, BadgeCheck, Layers, Lock, ArrowUpRight } from 'lucide-react'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { CopyButton } from '@/components/ui/CopyButton'
 import { siteConfig } from '@/lib/config'
+import { getPearlVersion } from '@/lib/version'
 
 export const metadata: Metadata = {
   title: 'Pearl.js — The TypeScript Backend Framework',
-  description: 'A batteries-included Node.js framework. Routing, auth, Drizzle ORM, BullMQ queues, events, and mail — 11 packages, one install.',
+  description: 'A batteries-included Node.js framework. Routing, auth, Drizzle ORM, BullMQ queues, events, mail, and security middleware — 11 packages, secure by default, one install.',
 }
 
 /* ── Packages ────────────────────────────────────────── */
+// Version is sourced from getPearlVersion() in the page component and applied
+// uniformly to every package row — all @pearl-framework/* packages release at
+// the same version (linked Changesets).
 const packages = [
-  { name: 'core',     accent: '#58a6ff', desc: 'IoC container, application kernel, service providers',            ver: '1.0.0' },
-  { name: 'http',     accent: '#00e5a0', desc: 'HTTP kernel — router, middleware pipeline, request/response',     ver: '1.0.0' },
-  { name: 'auth',     accent: '#f85149', desc: 'JWT, session, and API token authentication guards',               ver: '1.0.0' },
-  { name: 'database', accent: '#d29922', desc: 'Drizzle ORM — Postgres, MySQL, SQLite integration',              ver: '1.0.0' },
-  { name: 'validate', accent: '#bc8cff', desc: 'Zod-powered FormRequest, validation pipes, error formatting',    ver: '1.0.0' },
-  { name: 'events',   accent: '#00e5a0', desc: 'Type-safe event dispatcher, listeners, queued events',           ver: '1.0.0' },
-  { name: 'queue',    accent: '#f77f00', desc: 'BullMQ-powered job dispatching, workers, and retries',           ver: '1.0.0' },
-  { name: 'mail',     accent: '#79c0ff', desc: 'Nodemailer-powered mailable classes, transports, queue support', ver: '1.0.0' },
-  { name: 'testing',  accent: '#bc8cff', desc: 'HTTP test client, database helpers, mail fakes, test utilities', ver: '1.0.0' },
-  { name: 'cli',      accent: '#58a6ff', desc: 'CLI for scaffolding — new, serve, make:*',                      ver: '1.0.0' },
-  { name: 'pearl',    accent: '#d29922', desc: 'Meta-package — installs all packages in one command',            ver: '1.0.0' },
+  { name: 'core',     accent: '#ffffff', desc: 'IoC container, application kernel, service providers' },
+  { name: 'http',     accent: '#ffffff', desc: 'HTTP kernel — router, middleware pipeline, request/response' },
+  { name: 'auth',     accent: '#ffffff', desc: 'JWT, session, and API token authentication guards' },
+  { name: 'database', accent: '#ffffff', desc: 'Drizzle ORM — Postgres, MySQL, SQLite integration' },
+  { name: 'validate', accent: '#ffffff', desc: 'Zod-powered FormRequest, validation pipes, error formatting' },
+  { name: 'events',   accent: '#ffffff', desc: 'Type-safe event dispatcher, listeners, queued events' },
+  { name: 'queue',    accent: '#ffffff', desc: 'BullMQ-powered job dispatching, workers, and retries' },
+  { name: 'mail',     accent: '#ffffff', desc: 'Nodemailer-powered mailable classes, transports, queue support' },
+  { name: 'testing',  accent: '#ffffff', desc: 'HTTP test client, database helpers, mail fakes, test utilities' },
+  { name: 'cli',      accent: '#ffffff', desc: 'CLI for scaffolding — new, serve, make:*' },
+  { name: 'pearl',    accent: '#ffffff', desc: 'Meta-package — installs all packages in one command' },
 ]
 
 /* ── Feature sections ────────────────────────────────── */
 const features = [
   {
-    tag: 'Routing & Middleware', colour: '#58a6ff',
+    Icon: Route,
+    tag: 'Routing & Middleware', colour: '#ffffff',
     title: 'Routes. Middleware.\nTyped end-to-end.',
     body: `Define routes with a fully-typed HttpContext — params, query, body, and the authenticated user, all inferred. Apply middleware with a single array: authentication, logging, rate-limiting. No decorators, no magic.`,
     file: 'routes/api.ts',
@@ -36,7 +42,8 @@ const features = [
     href: '/docs/routing',
   },
   {
-    tag: 'Database', colour: '#d29922',
+    Icon: Database,
+    tag: 'Database', colour: '#ffffff',
     title: 'Drizzle ORM.\nBuilt right in.',
     body: `@pearl-framework/database wires Drizzle directly into the IoC container. Define your schema in TypeScript, query with full autocomplete and type safety, and run migrations with pearl migrate. Supports Postgres, MySQL, and SQLite.`,
     file: 'schema/posts.ts',
@@ -44,7 +51,8 @@ const features = [
     href: '/docs/database',
   },
   {
-    tag: 'Validation', colour: '#bc8cff',
+    Icon: BadgeCheck,
+    tag: 'Validation', colour: '#ffffff',
     title: 'Zod validation.\nBefore you see it.',
     body: `Extend FormRequest with a Zod schema. Pearl validates the incoming body before your controller runs — invalid requests get a structured 422 with field-level errors automatically. Nothing leaks through.`,
     file: 'requests/CreatePostRequest.ts',
@@ -52,12 +60,22 @@ const features = [
     href: '/docs/validation',
   },
   {
-    tag: 'Queues & Events', colour: '#00e5a0',
+    Icon: Layers,
+    tag: 'Queues & Events', colour: '#ffffff',
     title: 'Background jobs.\nDecoupled events.',
     body: `Dispatch slow work to BullMQ Redis workers with one line. Decouple side-effects using typed domain events — fire them from your service, react in dedicated listener classes. No direct imports between layers.`,
     file: 'jobs/SendWelcomeEmailJob.ts',
     code: `import { Job } from '@pearl-framework/queue'\nimport { Event, Listen, emit } from '@pearl-framework/events'\n\nclass SendWelcomeEmailJob extends Job {\n  userId!: number\n\n  async handle() {\n    await Mail.send(new WelcomeMail(this.userId))\n  }\n}\n\nclass UserRegisteredEvent extends Event {\n  constructor(public user: User) { super() }\n}\n\n// Fire from your service\nawait emit(new UserRegisteredEvent(user))\n\n@Listen(UserRegisteredEvent)\nclass OnUserRegistered {\n  async handle({ user }: UserRegisteredEvent) {\n    await Queue.dispatch(\n      Object.assign(new SendWelcomeEmailJob(), { userId: user.id })\n    )\n  }\n}`,
     href: '/docs/queue',
+  },
+  {
+    Icon: Lock,
+    tag: 'Security', colour: '#ffffff',
+    title: 'Secure by default.\nScaffolded in.',
+    body: `Every Pearl app starts with an explicit CORS allow-list, HSTS + CSP + X-Frame-Options headers, a per-IP rate limiter, a 1 MiB request-body cap, and an error handler that returns generic 500s so framework internals never reach clients. \`pearl new\` writes the middleware files into your project — wired in \`server.ts\`, yours to customise.`,
+    file: 'src/server.ts',
+    code: `import { Router, HttpKernel } from '@pearl-framework/http'\nimport { ErrorHandler } from './middleware/ErrorHandler.js'\nimport { SecurityHeaders } from './middleware/SecurityHeaders.js'\nimport { Cors } from './middleware/Cors.js'\nimport { apiRateLimit } from './middleware/RateLimit.js'\n\nconst router = new Router()\n\n// Order matters — error handler outermost, rate limit innermost\nrouter.use(new ErrorHandler())\nrouter.use(new SecurityHeaders())\nrouter.use(new Cors())\nrouter.use(apiRateLimit)\n\nconst kernel = new HttpKernel({\n  maxBodyBytes:     1024 * 1024,                  // 1 MiB cap\n  onUnhandledError: (err) => apm.report(err),     // never leaks to clients\n})\n\nawait kernel.useRouter(router).listen(3000)`,
+    href: '/docs/routing#kernel-options',
   },
 ]
 
@@ -67,17 +85,7 @@ function highlight(code: string): string {
   return code
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/(\/\/[^\n]*)/g,
-      s => `<em style="color:#8b949e;font-style:normal">${s}</em>`)
-    .replace(/('(?:[^'\\]|\\.)*')/g,
-      s => `<span style="color:#a5d6ff">${s}</span>`)
-    .replace(/\b(import|export|from|const|let|await|new|async|return|class|extends|public|readonly|default)\b/g,
-      k => `<span style="color:#ff7b72">${k}</span>`)
-    .replace(/\b([A-Z][a-zA-Z0-9]+)\b/g,
-      t => `<span style="color:#79c0ff">${t}</span>`)
-    .replace(/\b(\d+)\b/g,
-      n => `<span style="color:#d29922">${n}</span>`)
-    .replace(/\.([a-z_][a-zA-Z0-9_]*)\s*(?=\()/g,
-      (_, mm) => `.<span style="color:#00e5a0">${mm}</span>`)
+      s => `<em style="color:#6b7280;font-style:normal">${s}</em>`)
 }
 
 function CodeWin({ file, fileColour, children }: {
@@ -106,13 +114,13 @@ function CodeWin({ file, fileColour, children }: {
   )
 }
 
-export default function HomePage() {
+export default async function HomePage() {
   const installCmd = 'npm install @pearl-framework/pearl'
+  const version = await getPearlVersion()
 
   return (
     <>
-      <a href="#main-content" className="skip">Skip to main content</a>
-      <Navbar />
+      <Navbar version={version} />
 
       <main id="main-content" style={{ position: 'relative', zIndex: 1 }}>
 
@@ -140,10 +148,9 @@ export default function HomePage() {
               <span aria-hidden="true" style={{
                 width: 6, height: 6, borderRadius: '50%',
                 background: 'var(--accent)', flexShrink: 0,
-                animation: 'dot-pulse 2.5s ease-in-out infinite',
               }} />
               <span style={{ ...m, fontSize: '.72rem', color: 'var(--body)', letterSpacing: '.05em' }}>
-                v1.0.0 &nbsp;·&nbsp; 11 packages &nbsp;·&nbsp; <span style={{ color: 'var(--accent)' }}>now on npm</span>
+                v{version} &nbsp;·&nbsp; 11 packages &nbsp;·&nbsp; <span style={{ color: 'var(--accent)' }}>now on npm</span>
               </span>
             </div>
 
@@ -160,8 +167,8 @@ export default function HomePage() {
                 marginBottom: '1.25rem',
               }}
             >
-              A TypeScript framework for Node.js.<br />
-              <span style={{ color: 'var(--accent)' }}>Ship a real API today.</span>
+              The TypeScript backend<br />
+              <span style={{ color: 'var(--accent)' }}>framework.</span>
             </h1>
 
             {/* Subtitle — one tight line */}
@@ -169,7 +176,7 @@ export default function HomePage() {
               fontSize: '1.05rem', color: 'var(--body)',
               lineHeight: 1.7, marginBottom: '2rem', maxWidth: 500,
             }}>
-              One install gives you a typed router, auth, validation, background jobs, mail, and events — already integrated. Less wiring, faster shipping.
+              Routing, auth, validation, queues, mail — already integrated, secure by default.
             </p>
 
             {/* Install — primary action */}
@@ -193,7 +200,7 @@ export default function HomePage() {
 
             {/* CTAs — quieter */}
             <div className="fu fu4" style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', flexWrap: 'wrap' }}>
-              <Link href="/docs/getting-started" className="btn btn-primary">
+              <Link href="/docs/getting-started" className="btn btn-primary arrow-link">
                 Read the docs <span aria-hidden="true">→</span>
               </Link>
               <Link
@@ -206,10 +213,8 @@ export default function HomePage() {
                 }}
                 aria-label="View Pearl.js on GitHub (opens in new tab)"
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-                </svg>
                 Star on GitHub
+                <ArrowUpRight size={12} strokeWidth={1.8} aria-hidden="true" />
               </Link>
             </div>
           </div>
@@ -220,24 +225,24 @@ export default function HomePage() {
               <CodeWin file="src/server.ts">
                 <pre>
                   <code dangerouslySetInnerHTML={{ __html:
-`<span style="color:#ff7b72">import</span> { <span style="color:#79c0ff">Application</span>, <span style="color:#79c0ff">HttpKernel</span>, <span style="color:#79c0ff">Router</span>,
-         <span style="color:#79c0ff">AuthManager</span>, <span style="color:#79c0ff">Authenticate</span> } <span style="color:#ff7b72">from</span> <span style="color:#a5d6ff">'@pearl-framework/pearl'</span>
-<span style="color:#ff7b72">import</span> { <span style="color:#79c0ff">AppServiceProvider</span> } <span style="color:#ff7b72">from</span> <span style="color:#a5d6ff">'./providers/AppServiceProvider.js'</span>
+`import { Application, HttpKernel, Router,
+         AuthManager, Authenticate } from '@pearl-framework/pearl'
+import { AppServiceProvider } from './providers/AppServiceProvider.js'
 
-<span style="color:#ff7b72">const</span> app = <span style="color:#ff7b72">new</span> <span style="color:#79c0ff">Application</span>({ root: import.meta.dirname })
-app.<span style="color:#00e5a0">register</span>(<span style="color:#79c0ff">AppServiceProvider</span>)
-<span style="color:#ff7b72">await</span> app.<span style="color:#00e5a0">boot</span>()  <em style="color:#8b949e;font-style:normal">// loads .env + boots providers</em>
+const app = new Application({ root: import.meta.dirname })
+app.register(AppServiceProvider)
+await app.boot()  <em style="color:#6b7280;font-style:normal">// loads .env + boots providers</em>
 
-<span style="color:#ff7b72">const</span> auth   = app.container.<span style="color:#00e5a0">make</span>(<span style="color:#79c0ff">AuthManager</span>)
-<span style="color:#ff7b72">const</span> router = <span style="color:#ff7b72">new</span> <span style="color:#79c0ff">Router</span>()
+const auth   = app.container.make(AuthManager)
+const router = new Router()
 
-<em style="color:#8b949e;font-style:normal">// Auth-protected in one line — no manual JWT plumbing</em>
-router.<span style="color:#00e5a0">get</span>(<span style="color:#a5d6ff">'/me'</span>,
-  ctx =&gt; ctx.<span style="color:#00e5a0">json</span>(ctx.<span style="color:#00e5a0">get</span>(<span style="color:#a5d6ff">'auth.user'</span>)),
-  [<span style="color:#00e5a0">Authenticate</span>(auth)],
+<em style="color:#6b7280;font-style:normal">// Auth-protected in one line — no manual JWT plumbing</em>
+router.get('/me',
+  ctx =&gt; ctx.json(ctx.get('auth.user')),
+  [Authenticate(auth)],
 )
 
-<span style="color:#ff7b72">await</span> <span style="color:#ff7b72">new</span> <span style="color:#79c0ff">HttpKernel</span>().<span style="color:#00e5a0">useRouter</span>(router).<span style="color:#00e5a0">listen</span>(<span style="color:#d29922">3000</span>)` }} />
+await new HttpKernel().useRouter(router).listen(3000)` }} />
                 </pre>
               </CodeWin>
             </figure>
@@ -266,8 +271,8 @@ router.<span style="color:#00e5a0">get</span>(<span style="color:#a5d6ff">'/me'<
                   color: 'var(--text)', marginBottom: '1.25rem',
                 }}
               >
-                Built for the parts of backend work{' '}
-                <span style={{ color: 'var(--accent)' }}>that suck to wire yourself.</span>
+                Built for fast backend development.{' '}
+                <span style={{ color: 'var(--accent)' }}>No manual wiring required.</span>
               </h2>
               <p style={{ fontSize: '1rem', color: 'var(--body)', lineHeight: 1.85 }}>
                 Four reasons Pearl earns a spot in your stack. Each one is backed by a specific feature, not a marketing line.
@@ -284,34 +289,34 @@ router.<span style="color:#00e5a0">get</span>(<span style="color:#a5d6ff">'/me'<
             >
               {[
                 {
+                  Icon: Zap,
                   tag: 'Ship faster',
-                  colour: 'var(--accent)',
                   title: 'Day one, not week one.',
                   body: 'npx pearl new my-api scaffolds a complete project — auth routes, validated forms, queue worker, migration setup, .env, hot-reload — already wired. Your first endpoint is minutes away, not "after I pick a router."',
                   proof: 'npx pearl new my-api && pearl serve',
                 },
                 {
+                  Icon: Braces,
                   tag: 'Typed end-to-end',
-                  colour: 'var(--violet)',
                   title: 'The compiler is your QA.',
                   body: 'Params, query, body, validated FormRequest input, authenticated user, job payloads, dispatched events — all inferred. Rename a column, the compiler tells you every call site that needs updating.',
                   proof: 'const data = await CreatePostRequest.validate(ctx)\n//    ^^ typed from your Zod schema',
                 },
                 {
+                  Icon: FolderTree,
                   tag: 'Conventions, not decisions',
-                  colour: 'var(--blue)',
                   title: 'Where does this go? Already answered.',
                   body: 'Controllers, requests, jobs, listeners, mailables, migrations — each has a home, and the CLI generates the boilerplate. No bikeshedding, no folder-structure committee.',
                   proof: 'pearl make:controller Post --resource',
                 },
                 {
+                  Icon: ShieldCheck,
                   tag: 'Production-ready',
-                  colour: 'var(--amber)',
                   title: 'The "for v2" features are already in.',
                   body: 'Rate limiting, retry-with-backoff, dead-letter handling, structured 422/403 errors, algorithm-pinned JWT, prototype-pollution-safe job payloads. The stuff you\'d normally add after the first outage — already there.',
                   proof: 'new RateLimit({ windowMs: 15*60_000, max: 5 })',
                 },
-              ].map((p) => (
+              ].map((p, i) => (
                 <div
                   key={p.tag}
                   className="why-card"
@@ -323,7 +328,11 @@ router.<span style="color:#00e5a0">get</span>(<span style="color:#a5d6ff">'/me'<
                     display: 'flex', flexDirection: 'column', gap: '.85rem',
                   }}
                 >
-                  <p style={{ ...m, fontSize: '.68rem', color: p.colour, letterSpacing: '.1em', textTransform: 'uppercase', fontWeight: 600 }}>
+                  <span className="icon-tile" aria-hidden="true" style={{ marginBottom: '.25rem' }}>
+                    <p.Icon size={18} strokeWidth={1.6} />
+                  </span>
+                  <p style={{ ...m, fontSize: '.68rem', color: 'var(--muted)', letterSpacing: '.1em', textTransform: 'uppercase', fontWeight: 600 }}>
+                    <span style={{ color: 'var(--bg5)', marginRight: '.55rem' }}>{String(i + 1).padStart(2, '0')}</span>
                     {p.tag}
                   </p>
                   <h3 style={{
@@ -354,6 +363,141 @@ router.<span style="color:#00e5a0">get</span>(<span style="color:#a5d6ff">'/me'<
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* ── FEATURES ─────────────────────────────────────── */}
+        <section
+          aria-label="Features"
+          style={{ borderTop: '1px solid var(--border)', padding: '4rem 2rem 2rem' }}
+        >
+          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          {features.map((f, i) => (
+            <div
+              key={f.tag}
+              className="feature"
+              style={{ gridTemplateColumns: i % 2 === 0 ? '1fr 1.2fr' : '1.2fr 1fr' }}
+            >
+              {/* Copy */}
+              <div style={{ order: i % 2 === 0 ? 0 : 1 }}>
+                <span className="icon-tile" aria-hidden="true" style={{ marginBottom: '1rem' }}>
+                  <f.Icon size={20} strokeWidth={1.5} />
+                </span>
+                <p style={{ ...m, fontSize: '.68rem', color: 'var(--muted)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: 500 }}>
+                  <span style={{ color: 'var(--bg5)', marginRight: '.55rem' }}>{String(i + 1).padStart(2, '0')}</span>
+                  {f.tag}
+                </p>
+                <h2 style={{
+                  fontSize: 'clamp(1.85rem, 3vw, 2.8rem)',
+                  fontWeight: 800, letterSpacing: '-.03em',
+                  lineHeight: 1.1, marginBottom: '1.5rem',
+                }}>
+                  {f.title.split('\n').map((line, li) => (
+                    <span key={li} style={{ display: 'block', color: li === 0 ? 'var(--text)' : f.colour }}>
+                      {line}
+                    </span>
+                  ))}
+                </h2>
+                <p style={{ fontSize: '1rem', color: 'var(--body)', lineHeight: 1.85, marginBottom: '2rem' }}>
+                  {f.body}
+                </p>
+                <Link
+                  href={f.href}
+                  className="arrow-link"
+                  style={{
+                    ...m,
+                    display: 'inline-flex', alignItems: 'center', gap: '.4rem',
+                    fontSize: '.85rem', fontWeight: 600,
+                    color: f.colour,
+                    borderBottom: `1px solid ${f.colour}55`,
+                    paddingBottom: '2px',
+                    transition: 'border-color .15s',
+                  }}
+                >
+                  Read the docs <span aria-hidden="true">→</span>
+                </Link>
+              </div>
+
+              {/* Code */}
+              <div style={{ order: i % 2 === 0 ? 1 : 0 }}>
+                <figure aria-label={`${f.tag} code example`}>
+                  <CodeWin file={f.file} fileColour={f.colour}>
+                    <pre style={{ fontSize: '.78rem', lineHeight: 1.85 }}>
+                      <code dangerouslySetInnerHTML={{ __html: highlight(f.code) }} />
+                    </pre>
+                  </CodeWin>
+                </figure>
+              </div>
+            </div>
+          ))}
+          </div>
+        </section>
+
+        {/* ── PROJECT STRUCTURE ────────────────────────────── */}
+        <section
+          aria-labelledby="structure-heading"
+          style={{ background: 'var(--bg2)', borderTop: '1px solid var(--border)', padding: '7rem 2rem' }}
+        >
+          <div
+            style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5rem', alignItems: 'start' }}
+            className="hero-grid"
+          >
+            <div>
+              <p style={{ ...m, fontSize: '.68rem', color: 'var(--muted)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '.75rem' }}>CLI scaffolding</p>
+              <h2
+                id="structure-heading"
+                style={{ fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 800, letterSpacing: '-.03em', lineHeight: 1.1, color: 'var(--text)', marginBottom: '1.5rem' }}
+              >
+                One command.<br />
+                <span style={{ color: 'var(--accent)' }}>Everything generated.</span>
+              </h2>
+              <p style={{ fontSize: '1rem', color: 'var(--body)', lineHeight: 1.85, marginBottom: '2rem' }}>
+                <code>npx pearl new my-api</code> gives you a complete, structured project. <code>.env</code> is created automatically and loaded by Pearl on boot — no dotenv import, no manual wiring.
+              </p>
+              <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '.85rem' }}>
+                {[
+                  { c: 'var(--accent)', t: '.env auto-created and loaded on boot — no import needed' },
+                  { c: 'var(--blue)',   t: 'IoC container with constructor injection throughout' },
+                  { c: 'var(--amber)',  t: 'pearl make:controller, model, job, event, listener, migration' },
+                  { c: 'var(--accent)', t: 'pearl serve — hot-reload dev server, zero config' },
+                  { c: 'var(--violet)', t: 'pearl migrate — Drizzle migrations from the CLI' },
+                ].map(item => (
+                  <li key={item.t} style={{ display: 'flex', gap: '.85rem', alignItems: 'flex-start', fontSize: '.93rem', color: 'var(--body)' }}>
+                    <span aria-hidden="true" style={{
+                      width: 6, height: 6, borderRadius: '50%',
+                      background: item.c, flexShrink: 0, marginTop: '.48rem',
+                      boxShadow: `0 0 6px ${item.c}`,
+                    }} />
+                    {item.t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <figure aria-label="Project structure from pearl new my-api">
+              <CodeWin file="~ npx pearl new my-api">
+                <pre style={{ fontSize: '.8rem', lineHeight: 2.05 }}>
+                  <code dangerouslySetInnerHTML={{ __html:
+`<span style="color:#6b7280">my-api/</span>
+<span style="color:#6e7681">├──</span> <span style="color:#6b7280">src/</span>
+<span style="color:#6e7681">│   ├──</span> controllers/      <span style="color:#6b7280"># HTTP handlers</span>
+<span style="color:#6e7681">│   ├──</span> schema/           <span style="color:#6b7280"># Drizzle table defs</span>
+<span style="color:#6e7681">│   ├──</span> middleware/       <span style="color:#6b7280"># custom middleware</span>
+<span style="color:#6e7681">│   ├──</span> jobs/             <span style="color:#6b7280"># BullMQ background jobs</span>
+<span style="color:#6e7681">│   ├──</span> events/           <span style="color:#6b7280"># domain events</span>
+<span style="color:#6e7681">│   ├──</span> listeners/        <span style="color:#6b7280"># event listeners</span>
+<span style="color:#6e7681">│   ├──</span> mail/             <span style="color:#6b7280"># Mailable classes</span>
+<span style="color:#6e7681">│   ├──</span> requests/         <span style="color:#6b7280"># Zod FormRequest validation</span>
+<span style="color:#6e7681">│   ├──</span> routes/api.ts     <span style="color:#6b7280"># all your routes</span>
+<span style="color:#6e7681">│   ├──</span> database/migrations/
+<span style="color:#6e7681">│   ├──</span> providers/        <span style="color:#6b7280"># service providers</span>
+<span style="color:#6e7681">│   └──</span> <span style="color:#e6edf3">server.ts</span>         <span style="color:#6b7280"># entry point</span>
+├── .env                  <span style="color:#6b7280"># auto-created &amp; auto-loaded ✓</span>
+<span style="color:#6e7681">├──</span> <span style="color:#e6edf3">package.json</span>
+<span style="color:#6e7681">└──</span> <span style="color:#e6edf3">tsconfig.json</span>` }} />
+                </pre>
+              </CodeWin>
+            </figure>
           </div>
         </section>
 
@@ -389,7 +533,7 @@ router.<span style="color:#00e5a0">get</span>(<span style="color:#a5d6ff">'/me'<
             >
               {/* Left — what you build */}
               <div>
-                <p style={{ ...m, fontSize: '.7rem', color: 'var(--accent)', letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: '1.5rem', fontWeight: 600 }}>
+                <p style={{ ...m, fontSize: '.7rem', color: 'var(--muted)', letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: '1.5rem', fontWeight: 600 }}>
                   What you can build
                 </p>
                 <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '1.4rem' }}>
@@ -412,7 +556,7 @@ router.<span style="color:#00e5a0">get</span>(<span style="color:#a5d6ff">'/me'<
 
               {/* Right — what's already solved */}
               <div>
-                <p style={{ ...m, fontSize: '.7rem', color: 'var(--violet)', letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: '1.5rem', fontWeight: 600 }}>
+                <p style={{ ...m, fontSize: '.7rem', color: 'var(--muted)', letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: '1.5rem', fontWeight: 600 }}>
                   What you skip building
                 </p>
                 <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '.9rem' }}>
@@ -421,6 +565,10 @@ router.<span style="color:#00e5a0">get</span>(<span style="color:#a5d6ff">'/me'<
                     { need: 'Issue & verify JWTs safely',       got: 'JwtGuard — algorithm pinned, none blocked' },
                     { need: 'Cookie-based sessions',            got: 'SessionGuard with rotation + logout-all' },
                     { need: 'Rate-limit /login & /signup',      got: 'RateLimit middleware, pluggable store' },
+                    { need: 'Lock down CORS origins',           got: 'Allow-list middleware, refuses * by design' },
+                    { need: 'Set baseline security headers',    got: 'HSTS, CSP, X-Frame-Options scaffolded in' },
+                    { need: 'Cap incoming request bodies',      got: 'Built-in 1 MiB limit, override per kernel' },
+                    { need: 'Prevent error-message leaks',      got: 'Generic 500s; APM hook for the real cause' },
                     { need: 'Run background jobs',              got: 'BullMQ queue + retry/backoff helpers' },
                     { need: 'Send transactional mail',          got: 'Mailer + SMTP/SES + bulk concurrency' },
                     { need: 'Fire-and-forget domain events',    got: 'Typed dispatcher with onError APM hook' },
@@ -487,7 +635,7 @@ router.<span style="color:#00e5a0">get</span>(<span style="color:#a5d6ff">'/me'<
                         @pearl/{pkg.name}
                       </span>
                       <span style={{ ...m, fontSize: '.65rem', color: 'var(--muted)', background: 'var(--bg3)', padding: '1px 5px', borderRadius: 3, border: '1px solid var(--border)' }}>
-                        {pkg.ver}
+                        {version}
                       </span>
                     </div>
                     <p style={{ fontSize: '.79rem', color: 'var(--muted)', lineHeight: 1.5 }}>{pkg.desc}</p>
@@ -495,131 +643,6 @@ router.<span style="color:#00e5a0">get</span>(<span style="color:#a5d6ff">'/me'<
                 </div>
               ))}
             </div>
-          </div>
-        </section>
-
-        {/* ── FEATURES ─────────────────────────────────────── */}
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2rem 2rem 0' }}>
-          {features.map((f, i) => (
-            <div
-              key={f.tag}
-              className="feature"
-              style={{ gridTemplateColumns: i % 2 === 0 ? '1fr 1.2fr' : '1.2fr 1fr' }}
-            >
-              {/* Copy */}
-              <div style={{ order: i % 2 === 0 ? 0 : 1 }}>
-                <p style={{ ...m, fontSize: '.68rem', color: f.colour, letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1rem', fontWeight: 500 }}>
-                  {f.tag}
-                </p>
-                <h2 style={{
-                  fontSize: 'clamp(1.85rem, 3vw, 2.8rem)',
-                  fontWeight: 800, letterSpacing: '-.03em',
-                  lineHeight: 1.1, marginBottom: '1.5rem',
-                }}>
-                  {f.title.split('\n').map((line, li) => (
-                    <span key={li} style={{ display: 'block', color: li === 0 ? 'var(--text)' : f.colour }}>
-                      {line}
-                    </span>
-                  ))}
-                </h2>
-                <p style={{ fontSize: '1rem', color: 'var(--body)', lineHeight: 1.85, marginBottom: '2rem' }}>
-                  {f.body}
-                </p>
-                <Link
-                  href={f.href}
-                  style={{
-                    ...m,
-                    display: 'inline-flex', alignItems: 'center', gap: '.4rem',
-                    fontSize: '.85rem', fontWeight: 600,
-                    color: f.colour,
-                    borderBottom: `1px solid ${f.colour}55`,
-                    paddingBottom: '2px',
-                    transition: 'border-color .15s',
-                  }}
-                >
-                  Read the docs <span aria-hidden="true">→</span>
-                </Link>
-              </div>
-
-              {/* Code */}
-              <div style={{ order: i % 2 === 0 ? 1 : 0 }}>
-                <figure aria-label={`${f.tag} code example`}>
-                  <CodeWin file={f.file} fileColour={f.colour}>
-                    <pre style={{ fontSize: '.78rem', lineHeight: 1.85 }}>
-                      <code dangerouslySetInnerHTML={{ __html: highlight(f.code) }} />
-                    </pre>
-                  </CodeWin>
-                </figure>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* ── PROJECT STRUCTURE ────────────────────────────── */}
-        <section
-          aria-labelledby="structure-heading"
-          style={{ background: 'var(--bg2)', borderTop: '1px solid var(--border)', padding: '7rem 2rem' }}
-        >
-          <div
-            style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5rem', alignItems: 'start' }}
-            className="hero-grid"
-          >
-            <div>
-              <p style={{ ...m, fontSize: '.68rem', color: 'var(--muted)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '.75rem' }}>CLI scaffolding</p>
-              <h2
-                id="structure-heading"
-                style={{ fontSize: 'clamp(1.85rem, 3vw, 2.8rem)', fontWeight: 800, letterSpacing: '-.03em', lineHeight: 1.1, color: 'var(--text)', marginBottom: '1.5rem' }}
-              >
-                One command.<br />
-                <span style={{ color: 'var(--accent)' }}>Everything generated.</span>
-              </h2>
-              <p style={{ fontSize: '1rem', color: 'var(--body)', lineHeight: 1.85, marginBottom: '2rem' }}>
-                <code>npx pearl new my-api</code> gives you a complete, structured project. <code>.env</code> is created automatically and loaded by Pearl on boot — no dotenv import, no manual wiring.
-              </p>
-              <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '.85rem' }}>
-                {[
-                  { c: 'var(--accent)', t: '.env auto-created and loaded on boot — no import needed' },
-                  { c: 'var(--blue)',   t: 'IoC container with constructor injection throughout' },
-                  { c: 'var(--amber)',  t: 'pearl make:controller, model, job, event, listener, migration' },
-                  { c: 'var(--accent)', t: 'pearl serve — hot-reload dev server, zero config' },
-                  { c: 'var(--violet)', t: 'pearl migrate — Drizzle migrations from the CLI' },
-                ].map(item => (
-                  <li key={item.t} style={{ display: 'flex', gap: '.85rem', alignItems: 'flex-start', fontSize: '.93rem', color: 'var(--body)' }}>
-                    <span aria-hidden="true" style={{
-                      width: 6, height: 6, borderRadius: '50%',
-                      background: item.c, flexShrink: 0, marginTop: '.48rem',
-                      boxShadow: `0 0 6px ${item.c}`,
-                    }} />
-                    {item.t}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <figure aria-label="Project structure from pearl new my-api">
-              <CodeWin file="~ npx pearl new my-api">
-                <pre style={{ fontSize: '.8rem', lineHeight: 2.05 }}>
-                  <code dangerouslySetInnerHTML={{ __html:
-`<span style="color:#8b949e">my-api/</span>
-<span style="color:#6e7681">├──</span> <span style="color:#8b949e">src/</span>
-<span style="color:#6e7681">│   ├──</span> <span style="color:#f85149">controllers/</span>      <span style="color:#8b949e"># HTTP handlers</span>
-<span style="color:#6e7681">│   ├──</span> <span style="color:#79c0ff">schema/</span>           <span style="color:#8b949e"># Drizzle table defs</span>
-<span style="color:#6e7681">│   ├──</span> <span style="color:#d29922">middleware/</span>       <span style="color:#8b949e"># custom middleware</span>
-<span style="color:#6e7681">│   ├──</span> <span style="color:#00e5a0">jobs/</span>             <span style="color:#8b949e"># BullMQ background jobs</span>
-<span style="color:#6e7681">│   ├──</span> <span style="color:#00e5a0">events/</span>           <span style="color:#8b949e"># domain events</span>
-<span style="color:#6e7681">│   ├──</span> <span style="color:#00e5a0">listeners/</span>        <span style="color:#8b949e"># event listeners</span>
-<span style="color:#6e7681">│   ├──</span> <span style="color:#bc8cff">mail/</span>             <span style="color:#8b949e"># Mailable classes</span>
-<span style="color:#6e7681">│   ├──</span> <span style="color:#d29922">requests/</span>         <span style="color:#8b949e"># Zod FormRequest validation</span>
-<span style="color:#6e7681">│   ├──</span> <span style="color:#f85149">routes/api.ts</span>     <span style="color:#8b949e"># all your routes</span>
-<span style="color:#6e7681">│   ├──</span> <span style="color:#79c0ff">database/migrations/</span>
-<span style="color:#6e7681">│   ├──</span> <span style="color:#d29922">providers/</span>        <span style="color:#8b949e"># service providers</span>
-<span style="color:#6e7681">│   └──</span> <span style="color:#e6edf3">server.ts</span>         <span style="color:#8b949e"># entry point</span>
-<span style="color:#00e5a0">├── .env</span>                  <span style="color:#8b949e"># auto-created &amp; auto-loaded ✓</span>
-<span style="color:#6e7681">├──</span> <span style="color:#e6edf3">package.json</span>
-<span style="color:#6e7681">└──</span> <span style="color:#e6edf3">tsconfig.json</span>` }} />
-                </pre>
-              </CodeWin>
-            </figure>
           </div>
         </section>
 
@@ -631,13 +654,13 @@ router.<span style="color:#00e5a0">get</span>(<span style="color:#a5d6ff">'/me'<
           {/* Subtle radial glow */}
           <div aria-hidden="true" style={{
             position: 'absolute', inset: 0, pointerEvents: 'none',
-            background: 'radial-gradient(ellipse 50% 55% at 50% 105%, rgba(0,229,160,.06) 0%, transparent 65%)',
+            background: 'radial-gradient(ellipse 50% 55% at 50% 105%, rgba(255, 255, 255, 0.05) 0%, transparent 65%)',
           }} />
           {/* Top rule */}
           <div aria-hidden="true" style={{
             position: 'absolute', top: 0, left: '15%', right: '15%',
             height: 1,
-            background: 'linear-gradient(90deg, transparent, rgba(0,229,160,.35), transparent)',
+            background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent)',
           }} />
 
           <p style={{ ...m, fontSize: '.68rem', color: 'var(--muted)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '1.75rem' }}>
@@ -659,18 +682,19 @@ router.<span style="color:#00e5a0">get</span>(<span style="color:#a5d6ff">'/me'<
             <code>pearl serve</code> and you&apos;re live.
           </p>
           <div style={{ display: 'flex', gap: '.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/docs/getting-started" className="btn btn-primary" style={{ fontSize: '1rem', padding: '.85rem 2.25rem' }}>
+            <Link href="/docs/getting-started" className="btn btn-primary arrow-link" style={{ fontSize: '1rem', padding: '.85rem 2.25rem' }}>
               Read the docs <span aria-hidden="true">→</span>
             </Link>
-            <Link href={siteConfig.github} target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ fontSize: '1rem', padding: '.85rem 2.25rem' }}>
+            <Link href={siteConfig.github} target="_blank" rel="noopener noreferrer" className="btn btn-secondary arrow-link" style={{ fontSize: '1rem', padding: '.85rem 2.25rem' }}>
               View on GitHub
+              <ArrowUpRight size={14} strokeWidth={1.8} aria-hidden="true" />
             </Link>
           </div>
         </section>
 
       </main>
 
-      <Footer />
+      <Footer version={version} />
     </>
   )
 }

@@ -60,7 +60,22 @@ export default function MailPage() {
       <CodeBlock lang="bash" filename=".env" code={`MAIL_HOST=smtp.postmarkapp.com\nMAIL_PORT=587\nMAIL_USER=your-api-token\nMAIL_PASS=your-api-token`} />
 
       <h2 id="attachments">Attachments</h2>
-      <CodeBlock lang="typescript" code={`build() {\n  return this\n    .sendTo(this.user.email)\n    .subject('Your invoice')\n    .html('<p>Please find your invoice attached.</p>')\n    .attach({\n      filename:    'invoice.pdf',\n      path:        \`/tmp/invoices/\${this.invoiceId}.pdf\`,\n      contentType: 'application/pdf',\n    })\n}`} />
+      <p>
+        Read the file yourself and pass the bytes via <code>content</code>. The SMTP
+        transport refuses path-based and URL-based attachments by default (see the
+        security note below).
+      </p>
+      <CodeBlock lang="typescript" code={`import { readFile } from 'node:fs/promises'\n\nasync build() {\n  return this\n    .sendTo(this.user.email)\n    .subject('Your invoice')\n    .html('<p>Please find your invoice attached.</p>')\n    .attach({\n      filename:    'invoice.pdf',\n      content:     await readFile(\`/tmp/invoices/\${this.invoiceId}.pdf\`),\n      contentType: 'application/pdf',\n    })\n}`} />
+      <div className="my-4 rounded-md border border-amber-500/30 bg-amber-500/5 p-4 text-sm">
+        <strong className="text-amber-300">Security — attachment fetching is off by default.</strong>
+        {' '}<code>SmtpTransport</code> configures nodemailer with{' '}
+        <code>disableFileAccess: true</code> and <code>disableUrlAccess: true</code>, so
+        passing <code>path</code> or <code>href</code> on an attachment will fail. This
+        prevents an attacker who controls part of an attachment from reading arbitrary
+        local files or triggering SSRF against internal endpoints. If you genuinely need
+        path/URL fetching, build a custom transport that wraps nodemailer without these
+        flags.
+      </div>
 
       <h2 id="bulk">Sending in bulk</h2>
       <p>

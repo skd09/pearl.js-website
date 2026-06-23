@@ -2,11 +2,13 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { DocsSidebar } from '@/components/layout/DocsSidebar'
 import { DocsTOC } from '@/components/layout/DocsTOC'
+import { getPearlVersion } from '@/lib/version'
 
-export default function DocsLayout({ children }: { children: React.ReactNode }) {
+export default async function DocsLayout({ children }: { children: React.ReactNode }) {
+  const version = await getPearlVersion()
   return (
     <>
-      <Navbar />
+      <Navbar version={version} />
       <div
         className="docs-shell"
         style={{
@@ -24,7 +26,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         </main>
         <DocsTOC />
       </div>
-      <Footer />
+      <Footer version={version} />
     </>
   )
 }

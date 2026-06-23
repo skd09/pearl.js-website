@@ -1,9 +1,16 @@
 'use client'
 import Link from 'next/link'
 import { useState } from 'react'
+import { ArrowUpRight, Package } from 'lucide-react'
 import { navLinks, siteConfig } from '@/lib/config'
 
-export function Navbar() {
+// Only the npm link gets an icon prefix; GitHub links rely on the
+// external-link arrow + the label itself.
+const labelIcon: Record<string, React.ComponentType<{ size?: number; strokeWidth?: number; 'aria-hidden'?: boolean }>> = {
+  npm: Package,
+}
+
+export function Navbar({ version }: { version: string }) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -11,7 +18,7 @@ export function Navbar() {
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
       borderBottom: '1px solid var(--border)',
       backdropFilter: 'blur(20px)',
-      background: 'rgba(13,17,23,0.92)',
+      background: 'rgba(10,10,10,0.92)',
     }}>
       <div style={{
         maxWidth: 1200, margin: '0 auto', padding: '0 1.5rem',
@@ -27,29 +34,29 @@ export function Navbar() {
             fontSize: '0.62rem', fontFamily: 'var(--mono)', color: 'var(--muted)',
             border: '1px solid var(--border2)', padding: '1px 6px', borderRadius: 4, marginLeft: 2,
           }}>
-            v0.2.0
+            v{version}
           </span>
         </Link>
 
         {/* Desktop nav */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.15rem' }} className="desktop-nav">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              target={link.external ? '_blank' : undefined}
-              rel={link.external ? 'noopener noreferrer' : undefined}
-              className="nav-link"
-              style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}
-            >
-              {link.label}
-              {link.external && (
-                <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-                  <path d="M2 2h8v8M10 2L2 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                </svg>
-              )}
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const Icon = labelIcon[link.label]
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                target={link.external ? '_blank' : undefined}
+                rel={link.external ? 'noopener noreferrer' : undefined}
+                className="nav-link"
+                style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+              >
+                {Icon ? <Icon size={13} strokeWidth={1.8} aria-hidden /> : null}
+                {link.label}
+                {link.external && <ArrowUpRight size={11} strokeWidth={1.8} aria-hidden />}
+              </Link>
+            )
+          })}
           <Link href="/docs/getting-started" className="nav-cta" style={{ marginLeft: '0.5rem' }}>
             Get started →
           </Link>

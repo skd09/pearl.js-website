@@ -60,6 +60,18 @@ export default function RoutingPage() {
       </p>
       <CodeBlock lang="typescript" code={`await new HttpKernel()\n  .useMiddleware([ErrorHandlerMiddleware, CorsMiddleware, LoggerMiddleware])\n  .useRouter(router)\n  .listen(3000)`} />
 
+      <h2 id="kernel-options">Kernel options</h2>
+      <CodeBlock lang="typescript" code={`new HttpKernel({\n  router,\n  maxBodyBytes:     2 * 1024 * 1024,           // default 1 MiB\n  onUnhandledError: (err) => apm.report(err),   // ships unhandled exceptions to your APM\n})`} />
+      <p>
+        <code>maxBodyBytes</code> caps the request body at <strong>1 MiB by default</strong>;
+        anything larger is dropped with a <code>413</code> before any handler runs, so a single
+        client can't OOM the server with a streamed multi-GB payload. <code>onUnhandledError</code>
+        fires for every error that escapes the middleware chain — the client only sees
+        <code>error.message</code> when the error has an explicit <code>statusCode</code> below
+        500. Unhandled exceptions return a generic <code>Internal Server Error</code>, so
+        framework internals never leak.
+      </p>
+
       <h2 id="responses">Response helpers</h2>
       <p>
         <code>ctx.response</code> is chainable. These cover the common cases:
