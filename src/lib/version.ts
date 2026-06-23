@@ -6,7 +6,7 @@
  * build time, cached for an hour. Falls back to a hardcoded constant if the
  * registry is unreachable (offline build, npm outage) so the page never breaks.
  */
-const FALLBACK_VERSION = '1.1.2'
+const FALLBACK_VERSION = '1.1.3'
 
 export async function getPearlVersion(): Promise<string> {
   try {
