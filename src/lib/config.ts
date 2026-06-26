@@ -1,8 +1,8 @@
 export const siteConfig = {
   name: 'Pearl.js',
-  title: 'Pearl.js — The TypeScript Framework That Does It Right',
+  title: 'Pearl.js — A batteries-included TypeScript backend framework',
   description:
-    'Pearl.js is a batteries-included TypeScript framework for Node.js. Built with clean architecture, SOLID principles, and developer happiness in mind. Routing, auth, database, queues, mail — all in one.',
+    'Pearl.js gives Node.js developers everything to build an API in one install — routing, auth, validation, queues, mail, and background jobs, fully typed and secure by default. Works with Drizzle and Zod.',
   url: 'https://pearljs.dev',
   ogImage: 'https://pearljs.dev/og.png',
   github: 'https://github.com/pearl-js/pearl.js',
@@ -41,7 +41,7 @@ export interface FooterLink {
 }
 
 export const footerTagline =
-  'A TypeScript framework for Node.js backends. Routing, auth, validation, queues, mail, and events — already integrated.'
+  'A batteries-included TypeScript framework for Node.js. Routing, auth, validation, queues, mail, and events — built in and fully typed. Works with Drizzle and Zod.'
 
 /**
  * Static badges shown in the footer. The version badge is injected by

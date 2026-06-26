@@ -11,9 +11,10 @@ export default function GettingStartedPage() {
     <>
       <h1>Getting Started</h1>
       <p>
-        Pearl is a TypeScript framework for Node.js that ships everything you need in one
-        install: routing, JWT auth, Drizzle ORM, request validation, BullMQ queues, typed
-        events, and mail — all pre-integrated, zero glue required.
+        Pearl is a batteries-included TypeScript framework for Node.js. It gives you routing,
+        auth, validation, queues, events, and mail in one install, all fully typed. It works
+        with <strong>Drizzle</strong> and <strong>Zod</strong>, so the database and validation
+        parts use tools you may already know.
       </p>
 
       <h2 id="requirements">Requirements</h2>

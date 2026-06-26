@@ -8,8 +8,8 @@ import { siteConfig } from '@/lib/config'
 import { getPearlVersion } from '@/lib/version'
 
 export const metadata: Metadata = {
-  title: 'Pearl.js — The TypeScript Backend Framework',
-  description: 'A batteries-included Node.js framework. Routing, auth, Drizzle ORM, BullMQ queues, events, mail, and security middleware — 11 packages, secure by default, one install.',
+  title: 'Pearl.js — A batteries-included TypeScript backend framework',
+  description: 'Pearl.js gives Node.js developers everything to build an API in one install — routing, auth, validation, queues, mail, and background jobs, fully typed and secure by default. Works with Drizzle and Zod.',
 }
 
 /* ── Packages ────────────────────────────────────────── */
@@ -167,8 +167,8 @@ export default async function HomePage() {
                 marginBottom: '1.25rem',
               }}
             >
-              The TypeScript backend<br />
-              <span style={{ color: 'var(--accent)' }}>framework.</span>
+              Everything your Node.js API needs,<br />
+              <span style={{ color: 'var(--accent)' }}>in one install.</span>
             </h1>
 
             {/* Subtitle — one tight line */}
@@ -176,7 +176,7 @@ export default async function HomePage() {
               fontSize: '1.05rem', color: 'var(--body)',
               lineHeight: 1.7, marginBottom: '2rem', maxWidth: 500,
             }}>
-              Routing, auth, validation, queues, mail — already integrated, secure by default.
+              Routing, auth, validation, queues, mail, and background jobs — built in, fully typed, and secure by default. Works with Drizzle and Zod, so there&apos;s nothing new to learn.
             </p>
 
             {/* Install — primary action */}
@@ -271,11 +271,11 @@ await new HttpKernel().useRouter(router).listen(3000)` }} />
                   color: 'var(--text)', marginBottom: '1.25rem',
                 }}
               >
-                Built for fast backend development.{' '}
-                <span style={{ color: 'var(--accent)' }}>No manual wiring required.</span>
+                Less setup.{' '}
+                <span style={{ color: 'var(--accent)' }}>More building.</span>
               </h2>
               <p style={{ fontSize: '1rem', color: 'var(--body)', lineHeight: 1.85 }}>
-                Four reasons Pearl earns a spot in your stack. Each one is backed by a specific feature, not a marketing line.
+                Most frameworks leave you to wire everything together yourself. Pearl ships with the pieces already connected — and it works with Drizzle and Zod, so the database and validation parts use tools you may already know. Everything below is something Pearl actually does, with the code to prove it.
               </p>
             </div>
 
