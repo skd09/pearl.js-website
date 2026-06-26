@@ -5,7 +5,7 @@ export const siteConfig = {
     'Pearl.js is a batteries-included TypeScript framework for Node.js. Built with clean architecture, SOLID principles, and developer happiness in mind. Routing, auth, database, queues, mail — all in one.',
   url: 'https://pearljs.dev',
   ogImage: 'https://pearljs.dev/og.png',
-  github: 'https://github.com/skd09/pearl.js',
+  github: 'https://github.com/pearl-js/pearl.js',
   npm: 'https://www.npmjs.com/package/@pearl-framework/pearl',
   portfolio: 'https://sharvari.dev',
   keywords: [
@@ -29,7 +29,7 @@ export const siteConfig = {
 
 export const navLinks = [
   { label: 'Docs', href: '/docs/getting-started' },
-  { label: 'GitHub', href: 'https://github.com/skd09/pearl.js', external: true },
+  { label: 'GitHub', href: 'https://github.com/pearl-js/pearl.js', external: true },
   { label: 'npm', href: 'https://www.npmjs.com/package/@pearl-framework/pearl', external: true },
 ]
 

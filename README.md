@@ -13,7 +13,7 @@ Routing · JWT Auth · Drizzle ORM · Validation · Queues · Events · Mail —
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4%2B-60a5fa?labelColor=111118&style=flat-square)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-4ade80?labelColor=111118&style=flat-square)](https://nodejs.org/)
 
-[Docs](https://pearljs.dev/docs/getting-started) · [npm](https://www.npmjs.com/package/@pearl-framework/pearl) · [GitHub](https://github.com/skd09/pearl.js)
+[Docs](https://pearljs.dev/docs/getting-started) · [npm](https://www.npmjs.com/package/@pearl-framework/pearl) · [GitHub](https://github.com/pearl-js/pearl.js)
 
 </div>
 
@@ -182,7 +182,7 @@ export class AuthController {
 Pull requests are welcome. For major changes please open an issue first.
 
 ```bash
-git clone https://github.com/skd09/pearl.js
+git clone https://github.com/pearl-js/pearl.js
 cd pearl.js
 npm install
 npm run build
