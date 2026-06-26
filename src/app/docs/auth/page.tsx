@@ -93,12 +93,25 @@ export default function AuthPage() {
       </p>
       <CodeBlock lang="typescript" code={`import { Hash } from '@pearl-framework/pearl'\n\n// Hash before storing\nconst hash = await Hash.make('my-password')\n\n// Verify against a stored hash\nconst valid = await Hash.check('my-password', hash)  // true\nconst wrong = await Hash.check('wrong-pass',  hash)  // false`} />
 
+      <h2 id="authorization">Authorization (Gate)</h2>
+      <p>
+        Beyond authentication, the <code>Gate</code> lets you define abilities and policies,
+        then enforce them on routes with the <code>can()</code> middleware (which runs after{' '}
+        <code>Authenticate</code>).
+      </p>
+      <CodeBlock lang="typescript" code={`import { Gate, can } from '@pearl-framework/pearl'\n\nconst gate = new Gate<User>()\n  .define('admin',     (u) => u?.role === 'admin')\n  .define('edit-post', (u, post) => !!u && (post as Post).authorId === u.id)\n\n// Imperative checks\nif (await gate.allows('admin', user)) { /* ... */ }\nawait gate.authorize('edit-post', user, post)  // throws AccessDeniedError (403) if denied\n\n// Route middleware\nrouter.get('/admin', handler, [Authenticate(auth), can(gate, 'admin')])\nrouter.put('/posts/:id', handler, [\n  Authenticate(auth),\n  can(gate, 'edit-post', (ctx) => loadPost(ctx.request.param('id'))),\n])`} />
+      <p>
+        Unknown abilities deny by default, and <code>gate.authorize()</code> throws{' '}
+        <code>AccessDeniedError</code>, which Pearl surfaces as a <code>403</code>.
+      </p>
+
       <h2 id="security">Security notes</h2>
       <ul>
         <li>
-          <strong>Algorithm pinning</strong> — <code>jwt.verify()</code> is called with an
-          explicit <code>algorithms</code> allowlist. This prevents algorithm confusion
-          attacks where an attacker switches the token's algorithm to bypass verification.
+          <strong>Algorithm pinning</strong> — verification enforces the single configured
+          algorithm; the token&apos;s own <code>alg</code> header is never trusted. This
+          prevents algorithm-confusion attacks. (JWTs are signed and verified with Node&apos;s
+          built-in <code>crypto</code> — no third-party JWT library.)
         </li>
         <li>
           <strong><code>none</code> algorithm blocked</strong> — passing{' '}

@@ -51,25 +51,17 @@ export async function RequireApiKey(ctx: HttpContext, next: NextFunction) {
   await next()
 }`} />
 
-      <h2 id="cors">CORS middleware</h2>
+      <h2 id="cors">Built-in: CORS</h2>
       <p>
-        Handle CORS headers and preflight <code>OPTIONS</code> requests:
+        Pearl ships a configurable <code>Cors</code> middleware. Register it globally so it
+        also answers preflight <code>OPTIONS</code> requests for any route:
       </p>
-      <CodeBlock lang="typescript" filename="src/middleware/CorsMiddleware.ts" code={`import type { HttpContext, NextFunction } from '@pearl-framework/pearl'
-
-export async function CorsMiddleware(ctx: HttpContext, next: NextFunction) {
-  ctx.response.setHeader('Access-Control-Allow-Origin',  '*')
-  ctx.response.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS')
-  ctx.response.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-
-  // Preflight requests end here
-  if (ctx.request.method === 'OPTIONS') {
-    ctx.response.status(204).end()
-    return
-  }
-
-  await next()
-}`} />
+      <CodeBlock lang="typescript" code={`import { Cors } from '@pearl-framework/pearl'\n\nrouter.use(new Cors({\n  origin:      ['https://app.example.com'], // string | string[] | (origin) => boolean | true | false\n  methods:     ['GET', 'POST', 'PUT', 'DELETE'],\n  credentials: true,\n  maxAge:      600,\n}))`} />
+      <p>
+        Defaults to allowing any origin (<code>*</code>). With <code>credentials</code> enabled,
+        the specific request origin is echoed instead of <code>*</code> (per the CORS spec) and
+        a <code>Vary: Origin</code> header is added.
+      </p>
 
       <h2 id="error-handler">Error handler middleware</h2>
       <p>
@@ -113,6 +105,12 @@ export async function ErrorHandlerMiddleware(ctx: HttpContext, next: NextFunctio
         rate-limits consistently across every instance.
       </p>
 
+      <h3 id="named-limiters">Named rate limiters</h3>
+      <p>
+        Define limiters once and apply them by name on routes with <code>throttle()</code>:
+      </p>
+      <CodeBlock lang="typescript" code={`import { RateLimiter, throttle } from '@pearl-framework/pearl'\n\n// Optional — share counters across processes (defaults to in-memory)\nRateLimiter.useStore(redisStore)\n\nRateLimiter.for('login', () => ({ windowMs: 15 * 60_000, max: 5 }))\nRateLimiter.for('api',   (ctx) => ({ windowMs: 60_000, max: 60, key: ctx.get<{ id: number }>('auth.user')?.id?.toString() }))\n\nrouter.post('/auth/login', loginHandler, [throttle('login')])\nrouter.get('/feed',        feedHandler,  [throttle('api')])`} />
+
       <h2 id="applying">Applying middleware</h2>
       <p>
         Use <code>router.use()</code> for global middleware (runs on every request) and pass
@@ -120,7 +118,7 @@ export async function ErrorHandlerMiddleware(ctx: HttpContext, next: NextFunctio
       </p>
       <CodeBlock lang="typescript" code={`// Global middleware — runs on every request, in order
 router.use(ErrorHandlerMiddleware)  // register first — wraps everything
-router.use(CorsMiddleware)
+router.use(new Cors())
 router.use(LoggerMiddleware)
 
 // Per-route — only runs on this route
