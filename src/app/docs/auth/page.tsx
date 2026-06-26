@@ -87,7 +87,8 @@ export default function AuthPage() {
 
       <h2 id="password-hashing">Password hashing</h2>
       <p>
-        Use the built-in <code>Hash</code> utility — bcrypt under the hood. Never store
+        Use the built-in <code>Hash</code> utility — scrypt (Node&apos;s built-in
+        <code>crypto</code>) under the hood, no third-party dependency. Never store
         plain-text passwords.
       </p>
       <CodeBlock lang="typescript" code={`import { Hash } from '@pearl-framework/pearl'\n\n// Hash before storing\nconst hash = await Hash.make('my-password')\n\n// Verify against a stored hash\nconst valid = await Hash.check('my-password', hash)  // true\nconst wrong = await Hash.check('wrong-pass',  hash)  // false`} />
