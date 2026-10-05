@@ -58,9 +58,16 @@ export async function RequireApiKey(ctx: HttpContext, next: NextFunction) {
       </p>
       <CodeBlock lang="typescript" code={`import { Cors } from '@pearl-framework/pearl'\n\nrouter.use(new Cors({\n  origin:      ['https://app.example.com'], // string | string[] | (origin) => boolean | true | false\n  methods:     ['GET', 'POST', 'PUT', 'DELETE'],\n  credentials: true,\n  maxAge:      600,\n}))`} />
       <p>
-        Defaults to allowing any origin (<code>*</code>). With <code>credentials</code> enabled,
-        the specific request origin is echoed instead of <code>*</code> (per the CORS spec) and
-        a <code>Vary: Origin</code> header is added.
+        Defaults to allowing any origin (<code>*</code>). Origins outside the allow-list get no
+        CORS headers, so the browser blocks them; a disallowed preflight is answered{' '}
+        <code>403</code>.
+      </p>
+      <p>
+        <code>credentials: true</code> requires an explicit <code>origin</code> — pairing it with{' '}
+        <code>*</code>, <code>true</code>, or no origin at all throws at construction. Echoing
+        whatever origin the caller sends while allowing credentials would let any site make
+        cookie-bearing requests to your app and read the responses. With an allow-list, the
+        matched origin is echoed and a <code>Vary: Origin</code> header is added.
       </p>
 
       <h2 id="error-handler">Error handler middleware</h2>
