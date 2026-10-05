@@ -116,6 +116,7 @@ export const docsNav: DocsNavSection[] = [
       { label: 'Middleware',  href: '/docs/middleware' },
       { label: 'Cookies',     href: '/docs/cookies' },
       { label: 'Validation',  href: '/docs/validation' },
+      { label: 'OpenAPI',     href: '/docs/openapi' },
     ],
   },
   {
