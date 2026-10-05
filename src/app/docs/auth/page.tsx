@@ -74,7 +74,15 @@ export default function AuthPage() {
         and supports rotation-on-use and "log out all devices".
       </p>
       <CodeBlock lang="typescript" filename="src/providers/AppServiceProvider.ts" code={`import { SessionGuard, AuthManager } from '@pearl-framework/pearl'\nimport type { SessionStore, UserProvider } from '@pearl-framework/pearl'\n\n// Provide your own store — Redis, DB table, etc.\nconst store: SessionStore = {\n  async find(id)         { /* ... */ },\n  async save(record)     { /* ... */ },\n  async destroy(id)      { /* ... */ },\n  async destroyAll(uid)  { /* ... */ },\n}\n\nthis.container.singleton(SessionGuard, () =>\n  new SessionGuard(userProvider, store, {\n    lifetimeSeconds: 60 * 60 * 2,  // 2h\n    rotateOnUse:      true,        // issue a fresh id on every successful check\n  })\n)`} />
-      <CodeBlock lang="typescript" code={`// Login — issue a session and set the cookie\nconst id = await guard.attempt(email, password)\nif (!id) return ctx.response.unauthorized()\nctx.response.header('set-cookie', \`sid=\${id}; HttpOnly; Secure; SameSite=Lax\`)\nctx.response.ok({ ok: true })\n\n// Logout — destroy this session\nawait guard.logout(id)\n\n// "Log out everywhere" — destroy every session for the user\nawait guard.logoutAll(user)`} />
+      <CodeBlock lang="typescript" code={`// Resolve the session cookie into ctx.get('auth.user') on every request\nrouter.use(session(guard))\n\n// Login — issues the session and sets a signed cookie\nconst user = await userProvider.findByCredentials(email, password)\nif (!user) return ctx.response.unauthorized()\nawait startSession(ctx, guard, user)\nctx.response.ok({ ok: true })\n\n// Logout — destroys the session and clears the cookie\nawait endSession(ctx, guard)\n\n// Require a session on a route\nrouter.get('/me', meHandler, [session(guard, { required: true })])\n\n// "Log out everywhere" — destroy every session for the user\nawait guard.logoutAll(user)`} />
+      <p>
+        Set <code>cookieSecret</code> on the kernel so the session cookie is signed, and
+        pair <code>rotateOnUse</code> with <code>onRotate: rotateSessionCookie()</code> —
+        the guard is built once, but the replacement <code>Set-Cookie</code> belongs to
+        whichever request is in flight. Without that hook the rotated id never reaches the
+        browser and the user is logged out on their next request. See{' '}
+        <a href="/docs/cookies">Cookies</a> for the underlying API.
+      </p>
 
       <h2 id="form-request-auth">FormRequest authorization errors</h2>
       <p>

@@ -114,6 +114,7 @@ export const docsNav: DocsNavSection[] = [
       { label: 'Routing',     href: '/docs/routing' },
       { label: 'Controllers', href: '/docs/controllers' },
       { label: 'Middleware',  href: '/docs/middleware' },
+      { label: 'Cookies',     href: '/docs/cookies' },
       { label: 'Validation',  href: '/docs/validation' },
     ],
   },
