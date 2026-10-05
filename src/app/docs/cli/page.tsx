@@ -35,6 +35,8 @@ pearl new my-api`} />
           <tr><td><code>pearl new &lt;name&gt;</code></td><td>Scaffold a complete new project</td></tr>
           <tr><td><code>pearl serve</code></td><td>Start a hot-reload dev server</td></tr>
           <tr><td><code>pearl migrate</code></td><td>Run pending SQL migrations</td></tr>
+          <tr><td><code>pearl db:seed</code></td><td>Run the seeders in <code>database/seeders</code></td></tr>
+          <tr><td><code>pearl queue:work</code></td><td>Process queued jobs until stopped</td></tr>
           <tr><td><code>pearl make:controller &lt;Name&gt;</code></td><td>Generate a controller class</td></tr>
           <tr><td><code>pearl make:model &lt;Name&gt;</code></td><td>Generate a model with Drizzle schema</td></tr>
           <tr><td><code>pearl make:middleware &lt;Name&gt;</code></td><td>Generate a middleware function</td></tr>
@@ -96,6 +98,63 @@ pearl make:migration create_posts_table
       <CodeBlock lang="bash" code={`pearl serve
 # Pearl.js running on http://localhost:3000
 # Watching for changes...`} />
+
+      <h2 id="bootstrap">Commands that boot your app</h2>
+      <p>
+        <code>migrate</code>, <code>db:seed</code>, and <code>queue:work</code> need your
+        configuration, so they load <code>src/bootstrap.ts</code> — the module that
+        registers providers and boots the container without starting a server. Projects
+        from <code>pearl new</code> already have one.
+      </p>
+      <CodeBlock lang="typescript" filename="src/bootstrap.ts" code={`import 'dotenv/config'
+import { Application } from '@pearl-framework/core'
+import { DatabaseServiceProvider } from '@pearl-framework/database'
+import { AppServiceProvider } from './providers/AppServiceProvider.js'
+
+export async function bootstrap(): Promise<Application> {
+  const app = new Application({ root: import.meta.dirname })
+  app.register(DatabaseServiceProvider)
+  app.register(AppServiceProvider)
+  await app.boot()
+  return app
+}`} />
+
+      <h3 id="migrate">Migrations</h3>
+      <CodeBlock lang="bash" code={`pearl migrate
+pearl migrate --folder database/migrations`} />
+      <p>
+        There is no <code>migrate:rollback</code>. Drizzle — the default adapter —
+        generates no down migrations, so the command would be a no-op for most projects;
+        roll back with a new forward migration instead.
+      </p>
+
+      <h3 id="seeders">Seeders</h3>
+      <p>
+        Every file in <code>database/seeders</code> runs alphabetically. A seeder exports{' '}
+        <code>run(app)</code> and receives the booted application.
+      </p>
+      <CodeBlock lang="bash" code={`pearl db:seed
+pearl db:seed --class DatabaseSeeder`} />
+      <CodeBlock lang="typescript" filename="database/seeders/DatabaseSeeder.ts" code={`import type { Application } from '@pearl-framework/core'
+import { DatabaseManager } from '@pearl-framework/database'
+
+export async function run(app: Application): Promise<void> {
+  const db = app.container.make(DatabaseManager)
+  await db.adapter.db.insert(users).values([{ email: 'admin@example.com' }])
+}`} />
+
+      <h3 id="queue-work">Queue workers</h3>
+      <p>
+        Every class extending <code>Job</code> exported from <code>src/jobs</code> is
+        registered automatically. <code>SIGINT</code>/<code>SIGTERM</code> drains in-flight
+        jobs before exiting; a second signal exits immediately.
+      </p>
+      <CodeBlock lang="bash" code={`pearl queue:work
+pearl queue:work --queue mail --concurrency 5`} />
+      <p>
+        The command refuses to start on an empty job directory rather than running a worker
+        that fails every job it receives.
+      </p>
     </>
   )
 }
