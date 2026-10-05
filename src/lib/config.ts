@@ -122,6 +122,7 @@ export const docsNav: DocsNavSection[] = [
     title: 'Features',
     items: [
       { label: 'Database',       href: '/docs/database' },
+      { label: 'Cache',          href: '/docs/cache' },
       { label: 'Authentication', href: '/docs/auth' },
       { label: 'Events',         href: '/docs/events' },
       { label: 'Queues',         href: '/docs/queue' },
